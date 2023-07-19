@@ -1,17 +1,17 @@
 {
-  "name": "unplugin-starter",
+  "name": "unplugin-svg-sprite",
   "type": "module",
   "version": "0.1.0",
   "packageManager": "pnpm@8.6.0",
-  "description": "Register global imports on demand for Vite and Webpack",
+  "description": "Unified plugin system for svg sprite",
   "license": "MIT",
-  "homepage": "https://github.com/antfu/unplugin-starter#readme",
+  "homepage": "https://github.com/yunsii/unplugin-svg-sprite#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/unplugin-starter.git"
+    "url": "git+https://github.com/yunsii/unplugin-svg-sprite.git"
   },
   "bugs": {
-    "url": "https://github.com/antfu/unplugin-starter/issues"
+    "url": "https://github.com/yunsii/unplugin-svg-sprite/issues"
   },
   "keywords": [
     "unplugin",
@@ -76,25 +76,38 @@
     "build": "tsup",
     "dev": "tsup --watch src",
     "build:fix": "esno scripts/postbuild.ts",
-    "lint": "eslint .",
+    "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx .",
     "play": "npm -C playground run dev",
     "prepublishOnly": "npm run build",
     "release": "bumpp && npm publish",
     "start": "esno src/index.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged",
+    "lint-staged:lint": "eslint",
+    "lint:fix": "eslint --fix --ext .js,.jsx,.ts,.tsx .",
+    "prettier": "prettier --check --write --no-plugin-search \"**/*.(js|jsx|tsx|ts|css|less|scss|sass|md|yaml)\""
   },
   "dependencies": {
     "unplugin": "^1.3.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.39.5",
+    "@antfu/eslint-config": "^0.35.3",
+    "@antfu/eslint-config-react": "^0.35.3",
+    "@commitlint/cli": "^17.6.6",
+    "@commitlint/config-conventional": "^17.6.6",
+    "@commitlint/types": "^17.4.4",
+    "@jannajs/lint": "^2.3.5",
     "@types/node": "^18.16.16",
     "bumpp": "^9.1.0",
     "chalk": "^5.2.0",
     "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.6.0",
     "esno": "^0.16.3",
     "fast-glob": "^3.2.12",
+    "lint-staged": "^13.1.2",
     "nodemon": "^2.0.22",
+    "prettier": ">=2.0.0",
     "rimraf": "^5.0.1",
     "rollup": "^3.23.1",
     "tsup": "^6.7.0",
@@ -102,5 +115,11 @@
     "vite": "^4.3.9",
     "vitest": "^0.31.4",
     "webpack": "^5.85.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:lint",
+    "**/*.{js,jsx,tsx,ts,css,less,scss,sass,md,yaml}": [
+      "prettier --write --no-plugin-search"
+    ]
   }
 }

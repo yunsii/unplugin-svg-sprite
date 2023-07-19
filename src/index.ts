@@ -1,8 +1,9 @@
 import { createUnplugin } from 'unplugin'
+
 import type { Options } from './types'
 
-export default createUnplugin<Options | undefined>(options => ({
-  name: 'unplugin-starter',
+export default createUnplugin<Options | undefined>((options) => ({
+  name: 'unplugin-svg-sprite',
   transformInclude(id) {
     return id.endsWith('main.ts')
   },
