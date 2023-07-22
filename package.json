@@ -77,7 +77,7 @@
     "dev": "tsup --watch src",
     "build:fix": "esno scripts/postbuild.ts",
     "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx .",
-    "play": "npm -C playground run dev",
+    "play": "npm -C playground/vite-react run dev",
     "prepublishOnly": "npm run build",
     "release": "bumpp && npm publish",
     "start": "esno src/index.ts",
@@ -89,6 +89,12 @@
     "prettier": "prettier --check --write --no-plugin-search \"**/*.(js|jsx|tsx|ts|css|less|scss|sass|md|yaml)\""
   },
   "dependencies": {
+    "consola": "^3.2.3",
+    "dedent": "^1.2.0",
+    "fs-extra": "^11.1.1",
+    "globby": "^13.2.2",
+    "pathe": "^1.1.1",
+    "svg-sprite": "^2.0.2",
     "unplugin": "^1.3.1"
   },
   "devDependencies": {
@@ -98,7 +104,9 @@
     "@commitlint/config-conventional": "^17.6.6",
     "@commitlint/types": "^17.4.4",
     "@jannajs/lint": "^2.3.5",
+    "@types/fs-extra": "^11.0.1",
     "@types/node": "^18.16.16",
+    "@types/svg-sprite": "^0.0.34",
     "bumpp": "^9.1.0",
     "chalk": "^5.2.0",
     "eslint": "^8.42.0",
@@ -112,6 +120,7 @@
     "rollup": "^3.23.1",
     "tsup": "^6.7.0",
     "typescript": "^5.1.3",
+    "vinyl": "^3.0.0",
     "vite": "^4.3.9",
     "vitest": "^0.31.4",
     "webpack": "^5.85.0"

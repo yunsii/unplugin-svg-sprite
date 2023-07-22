@@ -1,0 +1,6 @@
+{
+  "cSpell.words": ["Spriter"],
+  "css.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore",
+  "svg.preview.background": "transparent"
+}
