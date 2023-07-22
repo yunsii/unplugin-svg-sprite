@@ -2,8 +2,6 @@
 
 [![NPM version](https://img.shields.io/npm/v/unplugin-svg-sprite?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-svg-sprite)
 
-Starter template for [unplugin](https://github.com/unjs/unplugin).
-
 ## Install
 
 ```bash
@@ -15,11 +13,11 @@ npm i unplugin-svg-sprite
 
 ```ts
 // vite.config.ts
-import Starter from 'unplugin-svg-sprite/vite'
+import svgSprite from 'unplugin-svg-sprite/vite'
 
 export default defineConfig({
   plugins: [
-    Starter({
+    svgSprite({
       /* options */
     }),
   ],
@@ -35,11 +33,11 @@ Example: [`playground/`](./playground/)
 
 ```ts
 // rollup.config.js
-import Starter from 'unplugin-svg-sprite/rollup'
+import svgSprite from 'unplugin-svg-sprite/rollup'
 
 export default {
   plugins: [
-    Starter({
+    svgSprite({
       /* options */
     }),
   ],
@@ -110,10 +108,10 @@ module.exports = {
 ```ts
 // esbuild.config.js
 import { build } from 'esbuild'
-import Starter from 'unplugin-svg-sprite/esbuild'
+import svgSprite from 'unplugin-svg-sprite/esbuild'
 
 build({
-  plugins: [Starter()],
+  plugins: [svgSprite()],
 })
 ```
 
