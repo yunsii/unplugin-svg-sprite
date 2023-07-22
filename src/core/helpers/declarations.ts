@@ -2,13 +2,24 @@ import dedent from 'dedent'
 import fse from 'fs-extra'
 import pathe from 'pathe'
 
-export function generateDeclarations(modules: string[]) {
+export function generateDeclarations(
+  modules: string[],
+  normalize?: (module: string) => string,
+) {
+  const mergedNormalize =
+    normalize ||
+    ((module) => {
+      return `
+        declare module '${module}' {
+          const SvgSpriteSymbol: (props: any) => any
+          export default SvgSpriteSymbol
+        }
+      `
+    })
+
   const dts = modules.map((item) => {
     return dedent`
-      declare module '${item}' {
-        const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
-        export default SvgSpriteSymbol
-      }
+      ${mergedNormalize(item)}
     `.trim()
   })
 

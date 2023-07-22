@@ -99,7 +99,10 @@ export function createContext(options: Options) {
       })
 
     store.svgSpriteCompiledResult = await spriter.compileAsync()
-    generateDeclarations(dtsModules)
+    generateDeclarations(
+      dtsModules,
+      spriteSymbolOptions?.runtime.normalizeModuleType,
+    )
 
     if (willGenFile) {
       fse.emptyDirSync(absoluteOutputPath)

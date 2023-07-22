@@ -3,6 +3,8 @@ export interface SymbolSpriteOptions {
   runtime: {
     itemGenerator: string
     spriteGenerator: string
+    /** 标准化雪碧图中模块类型，不指定类型为 any */
+    normalizeModuleType?: (module: string) => string
     /**
      * 默认直接返回形如下列结构的雪碧图字符串给到 `spriteGenerator`：
      *

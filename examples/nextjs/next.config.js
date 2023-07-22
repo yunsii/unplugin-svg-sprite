@@ -7,7 +7,6 @@ const nextConfig = {
   webpack: (config) => {
     config.plugins.push(
       require('../../dist/webpack.cjs').default({
-        debug: true,
         content: ['src/assets/**/*.svg'],
         sprites: [
           {
@@ -27,6 +26,14 @@ const nextConfig = {
                 'symbol',
                 'sprite-generator.mjs',
               ),
+              normalizeModuleType: (module) => {
+                return `
+                  declare module '${module}' {
+                    const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
+                    export default SvgSpriteSymbol
+                  }
+                `
+              },
             },
           },
         ],
