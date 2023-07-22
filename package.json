@@ -130,5 +130,9 @@
     "**/*.{js,jsx,tsx,ts,css,less,scss,sass,md,yaml}": [
       "prettier --write --no-plugin-search"
     ]
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   }
 }
