@@ -6,7 +6,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
 // @ts-ignore
-import unplugin from '../../src/vite'
+import unplugin from '../src/vite'
 
 export default defineConfig({
   plugins: [

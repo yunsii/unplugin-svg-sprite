@@ -1,24 +1,19 @@
-import SymbolSprite from 'unplugin-svg-sprite/symbol'
-
+import SymbolSprite from '~svg-sprite/symbol'
 import ViteSvg from '~svg-sprite/symbol/src/assets/raw/vite'
 import ReactSvg from '~svg-sprite/symbol/src/assets/raw/react'
 import VercelSvg from '~svg-sprite/symbol/src/assets/raw/vercel'
 import VercelCopySvg from '~svg-sprite/symbol/src/assets/vercel'
 
-import './App.less'
-
-function App() {
+export default function Home() {
   return (
-    <div>
+    <main
+      className={`flex min-h-screen flex-col items-center justify-between p-24`}
+    >
       <SymbolSprite />
-      <div className='flex'>
-        <ReactSvg />
-        <VercelSvg />
-        <ViteSvg />
-        <VercelCopySvg />
-      </div>
-    </div>
+      <ViteSvg />
+      <ReactSvg />
+      <VercelSvg />
+      <VercelCopySvg />
+    </main>
   )
 }
-
-export default App

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>SVG &lt;symbol&gt; sprite preview | svg-sprite</title>
+        <style>
+            body {
+                padding: 0;
+                margin: 0;
+                color: #666;
+                background: #fafafa;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 1em;
+                line-height: 1.4;
+            }
+
+            header {
+                display: block;
+                padding: 3em 3em 2em;
+                background-color: #fff;
+            }
+
+            header p {
+                margin: 2em 0 0;
+            }
+
+            section {
+                border-top: 1px solid #eee;
+                padding: 2em 3em 0;
+            }
+
+            section ul {
+                margin: 0;
+                padding: 0;
+            }
+
+            section li {
+                display: inline-block;
+                background-color: #fff;
+                position: relative;
+                margin: 0 2em 2em 0;
+                vertical-align: top;
+                border: 1px solid #ccc;
+                padding: 1em 1em 3em;
+                cursor: default;
+            }
+
+            .icon-box {
+                margin: 0;
+                width: 144px;
+                height: 144px;
+                position: relative;
+                background: #ccc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%23fff' d='M6 0h6v6H6zM0 6h6v6H0z'/%3E%3C/svg%3E") top left repeat;
+                border: 1px solid #ccc;
+                display: table-cell;
+                vertical-align: middle;
+                text-align: center;
+            }
+
+            .icon {
+                display: inline-block;
+            }
+
+            h1 {
+                margin-top: 0;
+            }
+
+            h2 {
+                margin: 0;
+                padding: 0;
+                font-size: 1em;
+                font-weight: 400;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                position: absolute;
+                left: 1em;
+                right: 1em;
+                bottom: 1em;
+            }
+
+            footer {
+                display: block;
+                margin: 0;
+                padding: 0 3em 3em;
+            }
+
+            footer p {
+                margin: 0;
+                font-size: .7em;
+            }
+
+            footer a {
+                color: #0f7595;
+                margin-left: 0;
+            }
+        </style>
+
+<!--
+Sprite shape dimensions
+====================================================================================================
+You will need to set the sprite shape dimensions via CSS when you use them as inline SVG, otherwise
+they would become a huge 100% in size. You may use the following dimension classes for doing so.
+They might well be outsourced to an external stylesheet of course.
+-->
+
+<style>
+ .svg-react-a03f288a-dims { width: 21px; height: 18.9px; }
+ .svg-vercel-5301f3e5-dims { width: 74px; height: 64px; }
+ .svg-vercel-5301f3e5-dims { width: 74px; height: 64px; }
+ .svg-vite-16d02779-dims { width: 410px; height: 404px; }
+</style>
+
+<!--
+====================================================================================================
+-->
+
+    </head>
+    <body>
+
+<!--
+Inline <symbol> SVG sprite
+====================================================================================================
+This is an inlined version of the generated SVG sprite. The single images may be <use>d everywhere
+below within this document. Please see
+
+    https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#defs--symbol-mode
+
+for further details on how to create this embeddable sprite variant.
+-->
+
+<svg width="0" height="0" style="position:absolute">
+     <symbol viewBox="-10.5 -9.45 21 18.9" id="react-a03f288a" xmlns="http://www.w3.org/2000/svg"><circle r="2" fill="currentColor"/><g stroke="currentColor" fill="none"><ellipse rx="10" ry="4.5"/><ellipse rx="10" ry="4.5" transform="rotate(60)"/><ellipse rx="10" ry="4.5" transform="rotate(120)"/></g></symbol>
+     <symbol viewBox="0 0 74 64" id="vercel-5301f3e5" xmlns="http://www.w3.org/2000/svg"><path d="m37.59.25 36.95 64H.64l36.95-64Z"/></symbol>
+     <symbol viewBox="0 0 74 64" id="vercel-5301f3e5" xmlns="http://www.w3.org/2000/svg"><path d="m37.59.25 36.95 64H.64l36.95-64Z"/></symbol>
+     <symbol viewBox="0 0 410 404" fill="none" id="vite-16d02779" xmlns="http://www.w3.org/2000/svg"><path d="m399.641 59.525-183.998 329.02c-3.799 6.793-13.559 6.833-17.415.073L10.582 59.556C6.38 52.19 12.68 43.266 21.028 44.76l184.195 32.923c1.175.21 2.378.208 3.553-.006l180.343-32.87c8.32-1.517 14.649 7.337 10.522 14.719Z" fill="url(#da)"/><path d="M292.965 1.574 156.801 28.255a5 5 0 0 0-4.03 4.611l-8.376 141.464c-.197 3.332 2.863 5.918 6.115 5.168l37.91-8.749c3.547-.818 6.752 2.306 6.023 5.873l-11.263 55.153c-.758 3.712 2.727 6.886 6.352 5.785l23.415-7.114c3.63-1.102 7.118 2.081 6.35 5.796l-17.899 86.633c-1.12 5.419 6.088 8.374 9.094 3.728l2.008-3.103 110.954-221.428c1.858-3.707-1.346-7.935-5.418-7.15l-39.022 7.532c-3.667.707-6.787-2.708-5.752-6.296l25.469-88.291c1.036-3.594-2.095-7.012-5.766-6.293Z" fill="url(#db)"/><defs><linearGradient id="da" x1="6" y1="33" x2="235" y2="344" gradientUnits="userSpaceOnUse"><stop stop-color="#41D1FF"/><stop offset="1" stop-color="#BD34FE"/></linearGradient><linearGradient id="db" x1="194.651" y1="8.818" x2="236.076" y2="292.989" gradientUnits="userSpaceOnUse"><stop stop-color="#FFEA83"/><stop offset=".083" stop-color="#FFDD35"/><stop offset="1" stop-color="#FFA800"/></linearGradient></defs></symbol>
+</svg>
+
+<!--
+====================================================================================================
+-->
+
+        <header>
+            <h1>SVG <code>&lt;symbol&gt;</code> sprite preview</h1>
+            <p>This preview features two methods of using the generated sprite in conjunction with inline SVG. Please have a look at the HTML source for further details and be aware of the following constraints:</p>
+            <ul>
+                <li>Your browser has to <a href="https://caniuse.com/svg-html5" target="_blank" rel="noopener noreferrer">support inline SVG</a> for these techniques to work.</li>
+                <li>The embedded sprite (A) slightly differs from the generated external one. Please <a href="https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#defs--symbol-mode" target="_blank" rel="noopener noreferrer">see the documentation</a> for details on how to create such an embeddable sprite.</li>
+            </ul>
+        </header>
+        <section>
+
+<!--
+A) Inline SVG with embedded sprite
+====================================================================================================
+These SVG images make use of fragment identifiers (IDs) and are extracted out of the inline sprite
+embedded above. They may be styled via CSS.
+-->
+
+            <h3>A) Inline SVG with embedded sprite</h3>
+            <ul>
+
+             <li title="react-a03f288a">
+                    <div class="icon-box">
+                        <svg class="svg-react-a03f288a-dims">
+                            <use xlink:href="#react-a03f288a"></use>
+                        </svg>
+                    </div>
+                    <h2>react-a03f288a, </h2>
+                </li>
+             <li title="vercel-5301f3e5">
+                    <div class="icon-box">
+                        <svg class="svg-vercel-5301f3e5-dims">
+                            <use xlink:href="#vercel-5301f3e5"></use>
+                        </svg>
+                    </div>
+                    <h2>vercel-5301f3e5, </h2>
+                </li>
+             <li title="vercel-5301f3e5">
+                    <div class="icon-box">
+                        <svg class="svg-vercel-5301f3e5-dims">
+                            <use xlink:href="#vercel-5301f3e5"></use>
+                        </svg>
+                    </div>
+                    <h2>vercel-5301f3e5, </h2>
+                </li>
+             <li title="vite-16d02779">
+                    <div class="icon-box">
+                        <svg class="svg-vite-16d02779-dims">
+                            <use xlink:href="#vite-16d02779"></use>
+                        </svg>
+                    </div>
+                    <h2>vite-16d02779, </h2>
+                </li>
+         </ul>
+
+<!--
+====================================================================================================
+-->
+
+        </section>
+        <section>
+
+<!--
+B) Inline SVG with external sprite
+====================================================================================================
+These SVG images make use of an URL + fragment identifiers (IDs) and refer to the regular external
+SVG sprite. They may be styled via CSS.
+-->
+
+            <h3>B) Inline SVG with external sprite</h3>
+            <ul>
+
+             <li title="react-a03f288a">
+                    <div class="icon-box">
+                        <svg class="svg-react-a03f288a-dims">
+                            <use xlink:href="svg/sprite.symbol.svg#react-a03f288a"></use>
+                        </svg>
+                    </div>
+                    <h2>react-a03f288a</h2>
+                </li>
+             <li title="vercel-5301f3e5">
+                    <div class="icon-box">
+                        <svg class="svg-vercel-5301f3e5-dims">
+                            <use xlink:href="svg/sprite.symbol.svg#vercel-5301f3e5"></use>
+                        </svg>
+                    </div>
+                    <h2>vercel-5301f3e5</h2>
+                </li>
+             <li title="vercel-5301f3e5">
+                    <div class="icon-box">
+                        <svg class="svg-vercel-5301f3e5-dims">
+                            <use xlink:href="svg/sprite.symbol.svg#vercel-5301f3e5"></use>
+                        </svg>
+                    </div>
+                    <h2>vercel-5301f3e5</h2>
+                </li>
+             <li title="vite-16d02779">
+                    <div class="icon-box">
+                        <svg class="svg-vite-16d02779-dims">
+                            <use xlink:href="svg/sprite.symbol.svg#vite-16d02779"></use>
+                        </svg>
+                    </div>
+                    <h2>vite-16d02779</h2>
+                </li>
+         </ul>
+
+<!--
+====================================================================================================
+-->
+
+        </section>
+        <footer>
+            <p>Generated at Sat, 22 Jul 2023 15:00:18 GMT by <a href="https://github.com/svg-sprite/svg-sprite" target="_blank" rel="noopener noreferrer">svg-sprite</a>.</p>
+        </footer>
+    </body>
+</html>

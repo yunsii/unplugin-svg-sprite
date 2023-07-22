@@ -77,7 +77,7 @@
     "dev": "tsup --watch src",
     "build:fix": "esno scripts/postbuild.ts",
     "lint": "eslint --cache --ext .js,.jsx,.ts,.tsx .",
-    "play": "npm -C playground/vite-react run dev",
+    "play": "npm -C playground run dev",
     "prepublishOnly": "npm run build",
     "release": "bumpp && npm publish",
     "start": "esno src/index.ts",

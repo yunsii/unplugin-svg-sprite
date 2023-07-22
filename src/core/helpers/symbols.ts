@@ -2,8 +2,6 @@ import dedent from 'dedent'
 
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
-export const SVG_SPRITE_SYMBOL_ID = 'unplugin-svg-sprite/symbol'
-
 export async function transformSymbolSprite(
   data: SvgSpriteSymbolData,
   userOptions: SymbolSpriteOptions,

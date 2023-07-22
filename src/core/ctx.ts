@@ -69,7 +69,10 @@ export function createContext(options: Options) {
     svgFiles
       .filter((item) => item.endsWith('.svg'))
       .map((item) => {
-        dtsModules.push(pathe.join(SVG_SPRITE_PREFIX, item).replace('.svg', ''))
+        dtsModules.push(
+          pathe.join(SVG_SPRITE_PREFIX, 'symbol', item).replace('.svg', ''),
+        )
+
         return pathe.join(process.cwd(), item)
       })
       .forEach((item) => {

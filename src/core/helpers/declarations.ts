@@ -6,7 +6,7 @@ export function generateDeclarations(modules: string[]) {
   const dts = modules.map((item) => {
     return dedent`
       declare module '${item}' {
-        const SvgSpriteSymbol: React.SVGProps<SVGSVGElement>
+        const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
         export default SvgSpriteSymbol
       }
     `.trim()

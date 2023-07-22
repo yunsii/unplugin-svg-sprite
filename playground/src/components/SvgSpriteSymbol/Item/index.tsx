@@ -1,6 +1,6 @@
 import React from 'react'
 
-import type { SvgSpriteSymbolItem } from '../../../../../../src/types'
+import type { SvgSpriteSymbolItem } from '../../../../../src/types'
 
 export interface ISvgSpriteItemProps {
   item: SvgSpriteSymbolItem
