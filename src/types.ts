@@ -21,7 +21,7 @@ export interface SymbolSpriteOptions {
 export interface Options {
   content?: string[]
   publicPath?: string
-  outputPath?: string
+  outputDir?: string
   sprites: SymbolSpriteOptions[]
   /**
    *
