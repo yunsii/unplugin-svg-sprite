@@ -116,3 +116,8 @@ build({
 ```
 
 <br></details>
+
+## References
+
+- [svg-sprite](https://github.com/svg-sprite/svg-sprite)
+- [How SVG Fragment Identifiers Work](https://css-tricks.com/svg-fragment-identifiers-work/)
