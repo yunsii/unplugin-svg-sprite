@@ -6,13 +6,11 @@ import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
 
 import { existGenFileMode, isGenFileMode } from './helpers/sprite'
+import { OUTPUT_DIR, SUPPORT_MODES, SVG_SPRITE_PREFIX } from './constants'
+import { generateDeclarations } from './helpers/declarations'
 
 import type { BufferFile } from 'vinyl'
 import type { Options } from '../types'
-
-const OUTPUT_DIR = 'svg-sprite'
-
-const SUPPORT_MODES = ['symbol'] as const
 
 export function createContext(options: Options) {
   const {
@@ -66,9 +64,12 @@ export function createContext(options: Options) {
       `!node_modules`,
     ])
 
+    const dtsModules: string[] = []
+
     svgFiles
       .filter((item) => item.endsWith('.svg'))
       .map((item) => {
+        dtsModules.push(pathe.join(SVG_SPRITE_PREFIX, item).replace('.svg', ''))
         return pathe.join(process.cwd(), item)
       })
       .forEach((item) => {
@@ -95,6 +96,7 @@ export function createContext(options: Options) {
       })
 
     store.svgSpriteCompiledResult = await spriter.compileAsync()
+    generateDeclarations(dtsModules)
 
     if (willGenFile) {
       fse.emptyDirSync(absoluteOutputPath)

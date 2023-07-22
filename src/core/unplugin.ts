@@ -1,4 +1,5 @@
 import { createUnplugin } from 'unplugin'
+import pathe from 'pathe'
 
 import {
   SVG_SPRITE_SYMBOL_ID,
@@ -6,6 +7,7 @@ import {
   transformSymbolSprite,
 } from './helpers/symbols'
 import { createContext } from './ctx'
+import { SVG_SPRITE_PREFIX } from './constants'
 
 import type { Options } from '../types'
 
@@ -18,7 +20,7 @@ export default createUnplugin<Options>((options) => {
       await ctx.scanDirs()
     },
     resolveId(id: string) {
-      if (id === SVG_SPRITE_SYMBOL_ID) {
+      if (id === SVG_SPRITE_SYMBOL_ID || id.startsWith(SVG_SPRITE_PREFIX)) {
         return id
       }
     },
@@ -26,22 +28,28 @@ export default createUnplugin<Options>((options) => {
       if (!ctx.spriteSymbolOptions) {
         return false
       }
-      return id === SVG_SPRITE_SYMBOL_ID
-    },
-    async load() {
-      const { data } = ctx.store.svgSpriteCompiledResult!
-      return transformSymbolSprite(data.symbol, ctx.spriteSymbolOptions!)
-    },
-    transformInclude(id) {
-      if (!ctx.store.svgSpriteCompiledResult || !ctx.spriteSymbolOptions) {
-        return false
+      if (id === SVG_SPRITE_SYMBOL_ID) {
+        return true
       }
-      return id.endsWith('.svg')
+
+      if (id.startsWith(SVG_SPRITE_PREFIX)) {
+        return !!ctx.store.svgSpriteCompiledResult && !!ctx.spriteSymbolOptions
+      }
     },
-    async transform(this, _, id) {
+    async load(id) {
+      if (id === SVG_SPRITE_SYMBOL_ID) {
+        const { data } = ctx.store.svgSpriteCompiledResult!
+        return transformSymbolSprite(data.symbol, ctx.spriteSymbolOptions!)
+      }
+
       const { data } = ctx.store.svgSpriteCompiledResult!
 
-      return transformSymbolItem(id, {
+      const realId = pathe.join(
+        process.cwd(),
+        `${id.replace(pathe.join(SVG_SPRITE_PREFIX, 'symbol', '/'), '')}.svg`,
+      )
+
+      return transformSymbolItem(realId, {
         data: data.symbol,
         userOptions: ctx.spriteSymbolOptions!,
         transformMap: ctx.store.transformMap,
