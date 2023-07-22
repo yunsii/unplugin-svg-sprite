@@ -4,8 +4,8 @@ import pathe from 'pathe'
 import fse from 'fs-extra'
 import { createUnplugin } from 'unplugin'
 import SVGSpriter from 'svg-sprite'
+import consola from 'consola'
 
-import { transformMap } from './helpers/cache'
 import {
   SVG_SPRITE_SYMBOL_ID,
   transformSymbolItem,
@@ -58,6 +58,7 @@ export default createUnplugin<Options | undefined>((options) => {
     mode,
   })
 
+  const transformMap: Record<string, string> = {}
   let svgSpriteCompiledResult: { result: any; data: any } | null = null
 
   return {
@@ -77,17 +78,26 @@ export default createUnplugin<Options | undefined>((options) => {
           return pathe.join(process.cwd(), item)
         })
         .forEach((item) => {
+          if (transformMap[item]) {
+            return
+          }
+
           const svgStr = fse.readFileSync(item, { encoding: 'utf-8' })
           const hash = crypto
             .createHash('md5')
             .update(svgStr, 'utf8')
             .digest('hex')
             .slice(0, 8)
-          const svgId = `${pathe.parse(item).name}-${hash}`
 
+          const svgId = `${pathe.parse(item).name}-${hash}`
           const svgHashPath = pathe.join(pathe.dirname(item), `${svgId}.svg`)
+
           spriter.add(svgHashPath, null, svgStr)
           transformMap[item] = svgId
+
+          if (debug) {
+            consola.log('add svg', item)
+          }
         })
 
       svgSpriteCompiledResult = await spriter.compileAsync()
@@ -135,6 +145,7 @@ export default createUnplugin<Options | undefined>((options) => {
       return transformSymbolItem(id, {
         data: data.symbol,
         userOptions: spriteSymbolOptions!,
+        transformMap,
       })
     },
   }

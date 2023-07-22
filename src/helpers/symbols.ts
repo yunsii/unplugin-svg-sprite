@@ -1,7 +1,5 @@
 import dedent from 'dedent'
 
-import { transformMap } from './cache'
-
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../types'
 
 export const SVG_SPRITE_SYMBOL_ID = 'unplugin-svg-sprite/symbol'
@@ -42,9 +40,10 @@ export async function transformSymbolItem(
   context: {
     data: SvgSpriteSymbolData
     userOptions: SymbolSpriteOptions
+    transformMap: Record<string, string>
   },
 ) {
-  const { data, userOptions } = context
+  const { data, userOptions, transformMap } = context
 
   const shapes = data.shapes
 
