@@ -2,5 +2,8 @@
   "cSpell.words": ["bumpp", "Spriter"],
   "css.lint.unknownAtRules": "ignore",
   "less.lint.unknownAtRules": "ignore",
-  "svg.preview.background": "transparent"
+  "svg.preview.background": "transparent",
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  }
 }

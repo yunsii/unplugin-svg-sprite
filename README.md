@@ -69,7 +69,11 @@ module.exports = {
 ```ts
 // nuxt.config.js
 export default {
-  buildModules: [
+  vue: {
+    runtimeCompiler: true,
+  },
+  // Nuxt 2 move `modules` into `buildModules`
+  modules: [
     [
       'unplugin-svg-sprite/nuxt',
       {
