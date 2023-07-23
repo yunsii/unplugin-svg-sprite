@@ -3,7 +3,7 @@ import pathe from 'pathe'
 
 import { transformSymbolItem, transformSymbolSprite } from './helpers/symbols'
 import { createContext } from './ctx'
-import { SVG_SPRITE_PREFIX, SpriteMode } from './constants'
+import { PLUGIN_NAME, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
 
 import type { Options } from '../types'
 
@@ -11,7 +11,7 @@ export default createUnplugin<Options>((options) => {
   const ctx = createContext(options)
 
   return {
-    name: 'unplugin-svg-sprite',
+    name: PLUGIN_NAME,
     buildStart: async () => {
       await ctx.scanDirs()
     },
