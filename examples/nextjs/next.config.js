@@ -8,9 +8,8 @@ const nextConfig = {
     config.plugins.push(
       require('../../dist/webpack.cjs').default({
         content: ['src/assets/**/*.svg'],
-        sprites: [
-          {
-            mode: 'symbol',
+        sprites: {
+          symbol: {
             runtime: {
               itemGenerator: path.join(
                 __dirname,
@@ -28,15 +27,18 @@ const nextConfig = {
               ),
               normalizeModuleType: (module) => {
                 return `
-                  declare module '${module}' {
-                    const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
-                    export default SvgSpriteSymbol
-                  }
-                `
+                    declare module '${module}' {
+                      const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
+                      export default SvgSpriteSymbol
+                    }
+                  `
               },
             },
           },
-        ],
+          stack: {
+            example: true,
+          },
+        },
       }),
     )
 

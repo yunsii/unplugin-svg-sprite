@@ -1,5 +1,7 @@
+import { SpriteMode } from '../constants'
+
 export function isGenFileMode(mode: any) {
-  return !['symbol'].includes(mode)
+  return !([SpriteMode.Symbol] satisfies SpriteMode[]).includes(mode)
 }
 
 export function existGenFileMode(mode: string[]) {

@@ -1,5 +1,6 @@
-export interface SymbolSpriteOptions {
-  mode: 'symbol'
+import type { ModeConfig } from 'svg-sprite'
+
+export interface SymbolSpriteOptions extends ModeConfig {
   runtime: {
     itemGenerator: string
     spriteGenerator: string
@@ -24,10 +25,19 @@ export interface Options {
   content?: string[]
   publicPath?: string
   outputDir?: string
-  sprites: SymbolSpriteOptions[]
+  sprites: {
+    symbol?: SymbolSpriteOptions
+    /**
+     *ref: https://simurai.com/blog/2012/04/02/svg-stacks
+     */
+    stack?: boolean | ModeConfig
+  }
   /**
+   * 是否开启 Debug 模式，默认 false
    *
+   * 开启后：
    *
+   * - 输出扫描到的 SVG
    */
   debug?: boolean
 }

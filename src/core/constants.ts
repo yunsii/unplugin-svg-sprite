@@ -1,6 +1,9 @@
 export const OUTPUT_DIR = 'svg-sprite'
 
-export const SUPPORT_MODES = ['symbol'] as const
+export enum SpriteMode {
+  Symbol = 'symbol',
+  Stack = 'stack',
+}
 
 /**
  * PREFIX/mode/path

@@ -14,9 +14,8 @@ export default defineConfig({
     tsconfigPaths(),
     unplugin({
       content: ['src/assets/**/*.svg'],
-      sprites: [
-        {
-          mode: 'symbol',
+      sprites: {
+        symbol: {
           runtime: {
             itemGenerator: path.join(
               __dirname,
@@ -34,15 +33,18 @@ export default defineConfig({
             ),
             normalizeModuleType: (module) => {
               return `
-                declare module '${module}' {
-                  const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
-                  export default SvgSpriteSymbol
-                }
-              `
+                  declare module '${module}' {
+                    const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
+                    export default SvgSpriteSymbol
+                  }
+                `
             },
           },
         },
-      ],
+        stack: {
+          example: true,
+        },
+      },
     }),
   ],
 })

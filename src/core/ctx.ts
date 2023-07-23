@@ -1,12 +1,13 @@
 import crypto from 'node:crypto'
 
+import { get, isPlainObject } from 'lodash'
 import consola from 'consola'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
 
 import { existGenFileMode, isGenFileMode } from './helpers/sprite'
-import { OUTPUT_DIR, SUPPORT_MODES, SVG_SPRITE_PREFIX } from './constants'
+import { OUTPUT_DIR, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
 import { generateDeclarations } from './helpers/declarations'
 
 import type { BufferFile } from 'vinyl'
@@ -17,32 +18,37 @@ export function createContext(options: Options) {
     content = ['**/*.svg'],
     publicPath = 'public',
     outputDir = OUTPUT_DIR,
-    sprites = [],
+    sprites = {},
     debug = false,
   } = options || {}
 
-  if (!sprites.length) {
+  if (!Object.keys(sprites).length) {
     throw new Error(
-      `Pick a sprite mode required, supported [${SUPPORT_MODES.join(', ')}]`,
+      `Pick a sprite mode required, supported [${Object.values(SpriteMode).join(
+        ', ',
+      )}]`,
     )
   }
 
-  const spriteSymbolOptions = sprites.find((item) => {
-    return item.mode === 'symbol'
-  })
-
   const absoluteOutputPath = pathe.join(process.cwd(), publicPath, outputDir)
+  const userMode = Object.keys(sprites)
+  const useSymbolMode = 'symbol' in sprites
 
-  const mode = sprites
-    .map((item) => item.mode)
-    .reduce((prev, current) => {
-      return {
-        ...prev,
-        [current]: {
-          example: debug,
-        },
-      }
-    }, {} as SVGSpriter.Mode)
+  const mode = userMode.reduce((prev, current) => {
+    const userCurrentConfig = get(sprites, [current])
+    const mergedConfig = isPlainObject(userCurrentConfig)
+      ? userCurrentConfig
+      : {}
+
+    return {
+      ...prev,
+      [current]: {
+        example: debug,
+        bust: true,
+        ...mergedConfig,
+      },
+    }
+  }, {} as SVGSpriter.Mode)
   const willGenFile = existGenFileMode(Object.keys(mode))
 
   const spriter = new SVGSpriter({
@@ -99,10 +105,12 @@ export function createContext(options: Options) {
       })
 
     store.svgSpriteCompiledResult = await spriter.compileAsync()
-    generateDeclarations(
-      dtsModules,
-      spriteSymbolOptions?.runtime.normalizeModuleType,
-    )
+    if (useSymbolMode) {
+      generateDeclarations(
+        dtsModules,
+        sprites.symbol?.runtime.normalizeModuleType,
+      )
+    }
 
     if (willGenFile) {
       fse.emptyDirSync(absoluteOutputPath)
@@ -128,7 +136,8 @@ export function createContext(options: Options) {
     publicPath,
     spriter,
     outputDir,
-    spriteSymbolOptions,
+    sprites,
+    useSymbolMode,
     absoluteOutputPath,
     willGenFile,
     debug,
