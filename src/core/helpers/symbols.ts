@@ -4,9 +4,14 @@ import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
 export async function transformSymbolSprite(
   data: SvgSpriteSymbolData,
-  options: SymbolSpriteOptions,
+  context: {
+    userOptions: SymbolSpriteOptions
+    pathname: string
+  },
 ) {
-  const _spriteGenerator = await import(options.runtime.spriteGenerator)
+  const { userOptions, pathname } = context
+
+  const _spriteGenerator = await import(userOptions.runtime.spriteGenerator)
 
   const spriteGenerator =
     typeof _spriteGenerator === 'function'
@@ -17,16 +22,18 @@ export async function transformSymbolSprite(
     throw new TypeError('Please export valid sprite generator function')
   }
 
-  const domStr = options.runtime.transformSpriteData
-    ? options.runtime.transformSpriteData(data)
-    : dedent`
-        <svg width="0" height="0" style="position:absolute">
-          ${data.shapes.map((item) => item.svg).join('')}
-        </svg>
-      `
+  const spriteProps = userOptions.runtime.transformSpriteData
+    ? userOptions.runtime.transformSpriteData(data, pathname)
+    : {
+        domStr: dedent`
+          <svg width="0" height="0" style="position:absolute">
+            ${data.shapes.map((item) => item.svg).join('')}
+          </svg>
+      `,
+      }
 
   const transformedCode = spriteGenerator({
-    domStr,
+    ...spriteProps,
     cwd: process.cwd(),
   })
 

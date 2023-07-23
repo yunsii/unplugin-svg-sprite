@@ -39,6 +39,11 @@ export default defineConfig({
                   }
                 `
             },
+            transformSpriteData: (raw, pathname) => {
+              return {
+                pathname,
+              }
+            },
           },
         },
         stack: {

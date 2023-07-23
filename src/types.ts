@@ -1,3 +1,4 @@
+import type { JsonObject } from 'type-fest'
 import type { ModeConfig } from 'svg-sprite'
 
 export interface SymbolSpriteOptions extends ModeConfig {
@@ -7,7 +8,7 @@ export interface SymbolSpriteOptions extends ModeConfig {
     /** 标准化雪碧图中模块类型，不指定类型为 any */
     normalizeModuleType?: (module: string) => string
     /**
-     * 默认直接返回形如下列结构的雪碧图字符串给到 `spriteGenerator`：
+     * 默认直接返回形如下列结构的雪碧图字符串 **domStr** 给到 `spriteGenerator`：
      *
      * ```
      * <svg width="0" height="0" style="position:absolute">
@@ -15,15 +16,21 @@ export interface SymbolSpriteOptions extends ModeConfig {
      * </svg>
      * ```
      *
-     * 如有必要可自行处理。
+     * 如果你想通过外链的方式，可让函数直接返回 `{ pathname }`，此时，应避免再次注入 domStr。
+     * 再在 SvgSpriteSymbol 中处理，参考处理方式 https://github.com/yunsii/unplugin-svg-sprite/blob/main/playground/src/components/SvgSpriteSymbol/index.tsx
+     *
+     * 如果确定某些生成的雪碧图不必要（比如直接使用 domStr 时，symbol 模式下的雪碧图静态文件就没必要了），可通过 .gitignore 添加。
      */
-    transformSpriteData?: (raw: SvgSpriteSymbolData) => any
+    transformSpriteData?: (
+      raw: SvgSpriteSymbolData,
+      pathname: string,
+    ) => JsonObject
   }
 }
 
 export interface Options {
   content?: string[]
-  publicPath?: string
+  publicDir?: string
   outputDir?: string
   sprites: {
     symbol?: SymbolSpriteOptions

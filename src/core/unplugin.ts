@@ -5,7 +5,7 @@ import { transformSymbolItem, transformSymbolSprite } from './helpers/symbols'
 import { createContext } from './ctx'
 import { PLUGIN_NAME, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
 
-import type { Options } from '../types'
+import type { Options, SvgSpriteSymbolData } from '../types'
 
 export default createUnplugin<Options>((options) => {
   const ctx = createContext(options)
@@ -34,7 +34,14 @@ export default createUnplugin<Options>((options) => {
 
         if (id === symbolPrefixPath) {
           const { data } = ctx.store.svgSpriteCompiledResult!
-          return transformSymbolSprite(data.symbol, ctx.sprites.symbol!)
+          return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
+            userOptions: ctx.sprites.symbol!,
+            pathname: pathe.join(
+              ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
+              SpriteMode.Symbol,
+              (data.symbol as SvgSpriteSymbolData).sprite,
+            ),
+          })
         }
 
         const { data } = ctx.store.svgSpriteCompiledResult!

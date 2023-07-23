@@ -6,7 +6,6 @@ import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
 
-import { existGenFileMode, isGenFileMode } from './helpers/sprite'
 import { OUTPUT_DIR, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
 import { generateDeclarations } from './helpers/declarations'
 
@@ -16,7 +15,7 @@ import type { Options } from '../types'
 export function createContext(options: Options) {
   const {
     content = ['**/*.svg'],
-    publicPath = 'public',
+    publicDir = 'public',
     outputDir = OUTPUT_DIR,
     sprites = {},
     debug = false,
@@ -30,7 +29,8 @@ export function createContext(options: Options) {
     )
   }
 
-  const absoluteOutputPath = pathe.join(process.cwd(), publicPath, outputDir)
+  const absolutePublicPath = pathe.join(process.cwd(), publicDir)
+  const absoluteOutputPath = pathe.join(absolutePublicPath, outputDir)
   const userMode = Object.keys(sprites)
   const useSymbolMode = 'symbol' in sprites
 
@@ -49,7 +49,6 @@ export function createContext(options: Options) {
       },
     }
   }, {} as SVGSpriter.Mode)
-  const willGenFile = existGenFileMode(Object.keys(mode))
 
   const spriter = new SVGSpriter({
     dest: absoluteOutputPath,
@@ -66,7 +65,7 @@ export function createContext(options: Options) {
 
     const svgFiles = globbySync([
       ...content,
-      `!${publicPath}/${outputDir}`,
+      `!${publicDir}/${outputDir}`,
       `!node_modules`,
     ])
 
@@ -112,16 +111,10 @@ export function createContext(options: Options) {
       )
     }
 
-    if (willGenFile) {
-      fse.emptyDirSync(absoluteOutputPath)
-    }
-    for (const [mode, modeResult] of Object.entries<{ string: BufferFile }>(
+    fse.emptyDirSync(absoluteOutputPath)
+    for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
       store.svgSpriteCompiledResult.result,
     )) {
-      // 非调试模式下，有些模式不用生成真实文件
-      if (!isGenFileMode(mode) && !debug) {
-        continue
-      }
       for (const resource of Object.values(modeResult)) {
         fse.ensureDirSync(pathe.dirname(resource.path))
         fse.writeFileSync(resource.path, resource.contents)
@@ -133,13 +126,12 @@ export function createContext(options: Options) {
     store,
     mode,
     content,
-    publicPath,
+    absolutePublicPath,
+    absoluteOutputPath,
     spriter,
     outputDir,
     sprites,
     useSymbolMode,
-    absoluteOutputPath,
-    willGenFile,
     debug,
     scanDirs,
   }
