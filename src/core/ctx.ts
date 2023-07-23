@@ -17,6 +17,7 @@ export function createContext(options: Options) {
     content = ['**/*.svg'],
     publicDir = 'public',
     outputDir = OUTPUT_DIR,
+    spriterConfig,
     sprites = {},
     debug = false,
   } = options || {}
@@ -51,6 +52,7 @@ export function createContext(options: Options) {
   }, {} as SVGSpriter.Mode)
 
   const spriter = new SVGSpriter({
+    ...spriterConfig,
     dest: absoluteOutputPath,
     mode,
   })

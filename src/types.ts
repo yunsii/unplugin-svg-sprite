@@ -1,3 +1,4 @@
+import type SVGSpriter from 'svg-sprite'
 import type { JsonObject } from 'type-fest'
 import type { ModeConfig } from 'svg-sprite'
 
@@ -32,6 +33,12 @@ export interface Options {
   content?: string[]
   publicDir?: string
   outputDir?: string
+  /**
+   * ref: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#configuration
+   *
+   * 可自定义 shape.transform: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#shape-transformations
+   */
+  spriterConfig?: Omit<SVGSpriter.Config, 'dest' | 'mode'>
   sprites: {
     symbol?: SymbolSpriteOptions
     /**
