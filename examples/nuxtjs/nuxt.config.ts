@@ -31,7 +31,7 @@ export default defineNuxtConfig({
               normalizeModuleType: (module: string) => {
                 return `
                     declare module '${module}' {
-                      const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
+                      const SvgSpriteSymbol: (props: SVGAttributes & ReservedProps) => any
                       export default SvgSpriteSymbol
                     }
                   `
