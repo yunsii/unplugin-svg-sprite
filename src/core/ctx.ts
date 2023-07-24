@@ -58,6 +58,7 @@ export function createContext(options: Options) {
   })
 
   const store = {
+    buildLoading: true,
     transformMap: {} as Record<string, string>,
     svgSpriteCompiledResult: null as { result: any; data: any } | null,
   }
@@ -101,27 +102,56 @@ export function createContext(options: Options) {
         store.transformMap[item] = svgId
 
         if (debug) {
-          consola.log('add svg', item)
+          consola.log('Add svg', item)
         }
       })
 
+    if (debug) {
+      consola.log(`Total: ${Object.keys(store.transformMap).length}`)
+      consola.log('Spriter compile start...')
+    }
     store.svgSpriteCompiledResult = await spriter.compileAsync()
-    if (useSymbolMode) {
-      generateDeclarations(
-        dtsModules,
-        sprites.symbol?.runtime.normalizeModuleType,
-      )
+
+    if (debug) {
+      consola.log('Spriter compile end')
     }
 
-    fse.emptyDirSync(absoluteOutputPath)
-    for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
-      store.svgSpriteCompiledResult.result,
-    )) {
-      for (const resource of Object.values(modeResult)) {
-        fse.ensureDirSync(pathe.dirname(resource.path))
-        fse.writeFileSync(resource.path, resource.contents)
+    async function declarations() {
+      if (useSymbolMode) {
+        if (debug) {
+          consola.log('Generate symbol declarations start...')
+        }
+        generateDeclarations(
+          dtsModules,
+          sprites.symbol?.runtime.normalizeModuleType,
+        )
+        if (debug) {
+          consola.log('Generate symbol declarations end')
+        }
       }
     }
+
+    async function writeFiles() {
+      if (debug) {
+        consola.log('Write sprite files start...')
+      }
+      await fse.emptyDir(absoluteOutputPath)
+      for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
+        store.svgSpriteCompiledResult!.result,
+      )) {
+        for (const resource of Object.values(modeResult)) {
+          await fse.ensureDir(pathe.dirname(resource.path))
+          await fse.writeFile(resource.path, resource.contents)
+        }
+      }
+      if (debug) {
+        consola.log('Write sprite files end')
+      }
+    }
+
+    await Promise.all([declarations(), writeFiles()])
+
+    store.buildLoading = false
   }
 
   return {

@@ -1,5 +1,6 @@
 import { createUnplugin } from 'unplugin'
 import pathe from 'pathe'
+import consola from 'consola'
 
 import { transformSymbolItem, transformSymbolSprite } from './helpers/symbols'
 import { createContext } from './ctx'
@@ -12,8 +13,18 @@ export default createUnplugin<Options>((options) => {
 
   return {
     name: PLUGIN_NAME,
-    buildStart: async () => {
-      await ctx.scanDirs()
+    buildStart: () => {
+      return new Promise((resolve, reject) => {
+        ctx
+          .scanDirs()
+          .then(() => {
+            resolve()
+          })
+          .catch((err) => {
+            reject(err)
+          })
+        resolve()
+      })
     },
     resolveId(id: string) {
       if (ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)) {
@@ -21,11 +32,45 @@ export default createUnplugin<Options>((options) => {
       }
     },
     loadInclude(id) {
-      if (ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)) {
-        return !!ctx.store.svgSpriteCompiledResult
-      }
+      return ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)
     },
     async load(id) {
+      function waitSpriteCompiled() {
+        return new Promise<void>((resolve, reject) => {
+          if (ctx.store.svgSpriteCompiledResult) {
+            resolve()
+          }
+
+          let count = 0
+
+          function check() {
+            setTimeout(() => {
+              count += 1
+              if (ctx.store.svgSpriteCompiledResult) {
+                resolve()
+                return
+              }
+
+              if (count >= 60) {
+                reject(new Error(`Compile by svg-sprite timeout of ${count}s`))
+              }
+
+              check()
+            }, 1e3)
+          }
+
+          check()
+        })
+      }
+
+      await waitSpriteCompiled()
+
+      const { data } = ctx.store.svgSpriteCompiledResult!
+
+      if (ctx.debug) {
+        consola.log('load id', id)
+      }
+
       if (ctx.useSymbolMode) {
         const symbolPrefixPath = pathe.join(
           SVG_SPRITE_PREFIX,
@@ -33,7 +78,6 @@ export default createUnplugin<Options>((options) => {
         )
 
         if (id === symbolPrefixPath) {
-          const { data } = ctx.store.svgSpriteCompiledResult!
           return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
             userOptions: ctx.sprites.symbol!,
             pathname: pathe.join(
@@ -43,8 +87,6 @@ export default createUnplugin<Options>((options) => {
             ),
           })
         }
-
-        const { data } = ctx.store.svgSpriteCompiledResult!
 
         const realId = pathe.join(
           process.cwd(),

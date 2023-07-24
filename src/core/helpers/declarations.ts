@@ -2,7 +2,7 @@ import dedent from 'dedent'
 import fse from 'fs-extra'
 import pathe from 'pathe'
 
-export function generateDeclarations(
+export async function generateDeclarations(
   modules: string[],
   normalize?: (module: string) => string,
 ) {
@@ -33,7 +33,7 @@ export function generateDeclarations(
 
   const result = `${prefix}\n\n${dts.join('\n\n')}`
 
-  fse.writeFileSync(
+  await fse.writeFile(
     pathe.join(process.cwd(), 'svg-sprite.d.ts'),
     result,
     'utf-8',

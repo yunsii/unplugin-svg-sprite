@@ -13,6 +13,7 @@ export default defineConfig({
     inspect(),
     tsconfigPaths(),
     unplugin({
+      debug: true,
       content: ['src/assets/**/*.svg'],
       sprites: {
         symbol: {
