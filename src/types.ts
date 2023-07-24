@@ -19,8 +19,6 @@ export interface SymbolSpriteOptions extends ModeConfig {
      *
      * 如果你想通过外链的方式，可让函数直接返回 `{ pathname }`，此时，应避免再次注入 domStr。
      * 再在 SvgSpriteSymbol 中处理，参考处理方式 https://github.com/yunsii/unplugin-svg-sprite/blob/main/playground/src/components/SvgSpriteSymbol/index.tsx
-     *
-     * 如果确定某些生成的雪碧图不必要（比如直接使用 domStr 时，symbol 模式下的雪碧图静态文件就没必要了），可通过 .gitignore 添加。
      */
     transformSpriteData?: (
       raw: SvgSpriteSymbolData,
