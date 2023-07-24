@@ -1,4 +1,5 @@
 import dedent from 'dedent'
+import pathe from 'pathe'
 
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
@@ -11,7 +12,9 @@ export async function transformSymbolSprite(
 ) {
   const { userOptions, pathname } = context
 
-  const _spriteGenerator = await import(userOptions.runtime.spriteGenerator)
+  const _spriteGenerator = await import(
+    pathe.normalize(userOptions.runtime.spriteGenerator)
+  )
 
   const spriteGenerator =
     typeof _spriteGenerator === 'function'
@@ -66,7 +69,9 @@ export async function transformSymbolItem(
     height: target.height,
   }
 
-  const _itemGenerator = await import(userOptions.runtime.itemGenerator)
+  const _itemGenerator = await import(
+    pathe.normalize(userOptions.runtime.itemGenerator)
+  )
 
   const itemGenerator =
     typeof _itemGenerator === 'function'
