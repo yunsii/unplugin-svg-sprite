@@ -1,6 +1,8 @@
 import dedent from 'dedent'
 import pathe from 'pathe'
 
+import { logger } from '../../log'
+
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
 export async function transformSymbolSprite(
@@ -12,9 +14,11 @@ export async function transformSymbolSprite(
 ) {
   const { userOptions, pathname } = context
 
-  const _spriteGenerator = await import(
-    `file:///${pathe.normalize(userOptions.runtime.spriteGenerator)}`
-  )
+  const spriteGeneratorPath = `file:///${pathe.normalize(
+    userOptions.runtime.spriteGenerator,
+  )}`
+  logger.debug('Const spriteGeneratorPath', spriteGeneratorPath)
+  const _spriteGenerator = await import(spriteGeneratorPath)
 
   const spriteGenerator =
     typeof _spriteGenerator === 'function'
@@ -35,9 +39,14 @@ export async function transformSymbolSprite(
       `,
       }
 
+  logger.debug('Const spriteProps', spriteProps)
+
+  const cwd = pathe.normalize(process.cwd())
+  logger.debug('Print cwd', cwd)
+
   const transformedCode = spriteGenerator({
     ...spriteProps,
-    cwd: pathe.normalize(process.cwd()),
+    cwd,
   })
 
   return { code: transformedCode, map: null }
@@ -69,9 +78,12 @@ export async function transformSymbolItem(
     height: target.height,
   }
 
-  const _itemGenerator = await import(
-    `file:///${pathe.normalize(userOptions.runtime.itemGenerator)}`
-  )
+  const itemGeneratorPath = `file:///${pathe.normalize(
+    userOptions.runtime.itemGenerator,
+  )}`
+  logger.debug('Const itemGeneratorPath', itemGeneratorPath)
+
+  const _itemGenerator = await import(itemGeneratorPath)
 
   const itemGenerator =
     typeof _itemGenerator === 'function'
@@ -81,9 +93,13 @@ export async function transformSymbolItem(
   if (typeof itemGenerator !== 'function') {
     throw new TypeError('Please export valid item generator function')
   }
+
+  const cwd = pathe.normalize(process.cwd())
+  logger.debug('Print cwd', cwd)
+
   const transformedCode = itemGenerator({
     item: result,
-    cwd: pathe.normalize(process.cwd()),
+    cwd,
   })
 
   return { code: transformedCode, map: null }

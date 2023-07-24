@@ -1,15 +1,16 @@
 import { createUnplugin } from 'unplugin'
 import pathe from 'pathe'
-import consola from 'consola'
+
+import { logger } from '../log'
 
 import { transformSymbolItem, transformSymbolSprite } from './helpers/symbols'
-import { createContext } from './ctx'
+import { getContext } from './ctx'
 import { PLUGIN_NAME, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
 
 import type { Options, SvgSpriteSymbolData } from '../types'
 
 export default createUnplugin<Options>((options) => {
-  const ctx = createContext(options)
+  const ctx = getContext(options)
 
   return {
     name: PLUGIN_NAME,
@@ -17,11 +18,12 @@ export default createUnplugin<Options>((options) => {
       try {
         await ctx.scanDirs()
       } catch (err) {
-        consola.error(err)
+        logger.error(err)
       }
     },
     resolveId(id: string) {
       if (ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)) {
+        logger.debug('Got resolveId', id)
         return id
       }
     },
@@ -29,6 +31,7 @@ export default createUnplugin<Options>((options) => {
       return ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)
     },
     async load(id) {
+      logger.debug('Got load id', id)
       try {
         function waitSpriteCompiled() {
           return new Promise<void>((resolve, reject) => {
@@ -64,10 +67,6 @@ export default createUnplugin<Options>((options) => {
 
         const { data } = ctx.store.svgSpriteCompiledResult!
 
-        if (ctx.debug) {
-          consola.log('load id', id)
-        }
-
         if (ctx.useSymbolMode) {
           const symbolPrefixPath = pathe.join(
             SVG_SPRITE_PREFIX,
@@ -97,7 +96,7 @@ export default createUnplugin<Options>((options) => {
           })
         }
       } catch (err) {
-        consola.error(err)
+        logger.error(err)
       }
     },
   }

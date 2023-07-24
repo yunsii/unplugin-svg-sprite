@@ -1,16 +1,23 @@
 import crypto from 'node:crypto'
 
 import { get, isPlainObject } from 'lodash'
-import consola from 'consola'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
+
+import { logger } from '../log'
 
 import { OUTPUT_DIR, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
 import { generateDeclarations } from './helpers/declarations'
 
 import type { BufferFile } from 'vinyl'
 import type { Options } from '../types'
+
+const store = {
+  compileComplete: false,
+  transformMap: {} as Record<string, string>,
+  svgSpriteCompiledResult: null as { result: any; data: any } | null,
+}
 
 export function createContext(options: Options) {
   const {
@@ -21,6 +28,10 @@ export function createContext(options: Options) {
     sprites = {},
     debug = false,
   } = options || {}
+
+  if (debug) {
+    logger.level = 4
+  }
 
   if (!Object.keys(sprites).length) {
     throw new Error(
@@ -57,13 +68,12 @@ export function createContext(options: Options) {
     mode,
   })
 
-  const store = {
-    buildLoading: true,
-    transformMap: {} as Record<string, string>,
-    svgSpriteCompiledResult: null as { result: any; data: any } | null,
-  }
-
   const scanDirs = async () => {
+    if (store.compileComplete) {
+      logger.debug('Compile completed, skip recompile')
+      return
+    }
+
     const { globbySync } = await import('globby')
 
     const svgFiles = globbySync([
@@ -101,40 +111,30 @@ export function createContext(options: Options) {
         spriter.add(svgHashPath, null, svgStr)
         store.transformMap[item] = svgId
 
-        if (debug) {
-          consola.log('Add svg', item)
-        }
+        logger.debug('Add svg', item)
       })
 
-    if (debug) {
-      consola.log(`Total: ${Object.keys(store.transformMap).length}`)
-      consola.log('Spriter compile start...')
-    }
+    logger.log(`SVG sprite size: ${Object.keys(store.transformMap).length}`)
+    logger.debug('Spriter compile start...')
     store.svgSpriteCompiledResult = await spriter.compileAsync()
 
     if (debug) {
-      consola.log('Spriter compile end')
+      logger.debug('Spriter compile end')
     }
 
     async function declarations() {
       if (useSymbolMode) {
-        if (debug) {
-          consola.log('Generate symbol declarations start...')
-        }
+        logger.debug('Generate symbol declarations start...')
         generateDeclarations(
           dtsModules,
           sprites.symbol?.runtime.normalizeModuleType,
         )
-        if (debug) {
-          consola.log('Generate symbol declarations end')
-        }
+        logger.debug('Generate symbol declarations end')
       }
     }
 
     async function writeFiles() {
-      if (debug) {
-        consola.log('Write sprite files start...')
-      }
+      logger.debug('Write sprite files start...')
       await fse.emptyDir(absoluteOutputPath)
       for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
         store.svgSpriteCompiledResult!.result,
@@ -144,14 +144,12 @@ export function createContext(options: Options) {
           await fse.writeFile(resource.path, resource.contents)
         }
       }
-      if (debug) {
-        consola.log('Write sprite files end')
-      }
+      logger.debug('Write sprite files end')
     }
 
     await Promise.all([declarations(), writeFiles()])
 
-    store.buildLoading = false
+    store.compileComplete = true
   }
 
   return {
@@ -167,4 +165,15 @@ export function createContext(options: Options) {
     debug,
     scanDirs,
   }
+}
+
+let ctx: ReturnType<typeof createContext>
+
+export function getContext(options: Options) {
+  if (ctx) {
+    logger.debug('Reuse ctx')
+    return ctx
+  }
+  logger.debug('Create new ctx')
+  return (ctx = createContext(options))
 }

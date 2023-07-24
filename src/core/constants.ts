@@ -1,5 +1,7 @@
 export const PLUGIN_NAME = 'unplugin-svg-sprite'
 
+export const PLUGIN_ATTR = 'USS'
+
 export const OUTPUT_DIR = 'svg-sprite'
 
 export enum SpriteMode {

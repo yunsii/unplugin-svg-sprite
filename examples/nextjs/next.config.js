@@ -7,6 +7,7 @@ const nextConfig = {
   webpack: (config) => {
     config.plugins.push(
       require('../../dist/webpack.cjs').default({
+        debug: true,
         content: ['src/assets/**/*.svg'],
         sprites: {
           symbol: {

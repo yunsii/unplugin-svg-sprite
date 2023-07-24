@@ -18,6 +18,12 @@ export default {
       return
     }
 
+    targetSvg.setAttribute('width', '0')
+    targetSvg.setAttribute('height', '0')
+    targetSvg.style.position = 'absolute'
+    targetSvg.style.bottom = '0'
+    targetSvg.style.right = '0'
+
     document.body.appendChild(targetSvg)
   },
 }
