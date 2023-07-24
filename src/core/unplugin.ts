@@ -13,18 +13,8 @@ export default createUnplugin<Options>((options) => {
 
   return {
     name: PLUGIN_NAME,
-    buildStart: () => {
-      return new Promise((resolve, reject) => {
-        ctx
-          .scanDirs()
-          .then(() => {
-            resolve()
-          })
-          .catch((err) => {
-            reject(err)
-          })
-        resolve()
-      })
+    buildStart: async () => {
+      await ctx.scanDirs()
     },
     resolveId(id: string) {
       if (ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)) {
