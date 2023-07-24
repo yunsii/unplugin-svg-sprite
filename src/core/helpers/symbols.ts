@@ -13,7 +13,7 @@ export async function transformSymbolSprite(
   const { userOptions, pathname } = context
 
   const _spriteGenerator = await import(
-    pathe.normalize(userOptions.runtime.spriteGenerator)
+    `file:///${pathe.normalize(userOptions.runtime.spriteGenerator)}`
   )
 
   const spriteGenerator =
@@ -37,7 +37,7 @@ export async function transformSymbolSprite(
 
   const transformedCode = spriteGenerator({
     ...spriteProps,
-    cwd: process.cwd(),
+    cwd: pathe.normalize(process.cwd()),
   })
 
   return { code: transformedCode, map: null }
@@ -70,7 +70,7 @@ export async function transformSymbolItem(
   }
 
   const _itemGenerator = await import(
-    pathe.normalize(userOptions.runtime.itemGenerator)
+    `file:///${pathe.normalize(userOptions.runtime.itemGenerator)}`
   )
 
   const itemGenerator =
@@ -83,7 +83,7 @@ export async function transformSymbolItem(
   }
   const transformedCode = itemGenerator({
     item: result,
-    cwd: process.cwd(),
+    cwd: pathe.normalize(process.cwd()),
   })
 
   return { code: transformedCode, map: null }
