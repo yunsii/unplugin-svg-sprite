@@ -14,7 +14,11 @@ export default createUnplugin<Options>((options) => {
   return {
     name: PLUGIN_NAME,
     buildStart: async () => {
-      await ctx.scanDirs()
+      try {
+        await ctx.scanDirs()
+      } catch (err) {
+        consola.error(err)
+      }
     },
     resolveId(id: string) {
       if (ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)) {
@@ -25,69 +29,75 @@ export default createUnplugin<Options>((options) => {
       return ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)
     },
     async load(id) {
-      function waitSpriteCompiled() {
-        return new Promise<void>((resolve, reject) => {
-          if (ctx.store.svgSpriteCompiledResult) {
-            resolve()
-          }
+      try {
+        function waitSpriteCompiled() {
+          return new Promise<void>((resolve, reject) => {
+            if (ctx.store.svgSpriteCompiledResult) {
+              resolve()
+            }
 
-          let count = 0
+            let count = 0
 
-          function check() {
-            setTimeout(() => {
-              count += 1
-              if (ctx.store.svgSpriteCompiledResult) {
-                resolve()
-                return
-              }
+            function check() {
+              setTimeout(() => {
+                count += 1
+                if (ctx.store.svgSpriteCompiledResult) {
+                  resolve()
+                  return
+                }
 
-              if (count >= 60) {
-                reject(new Error(`Compile by svg-sprite timeout of ${count}s`))
-              }
+                if (count >= 60) {
+                  reject(
+                    new Error(`Compile by svg-sprite timeout of ${count}s`),
+                  )
+                }
 
-              check()
-            }, 1e3)
-          }
+                check()
+              }, 1e3)
+            }
 
-          check()
-        })
-      }
-
-      await waitSpriteCompiled()
-
-      const { data } = ctx.store.svgSpriteCompiledResult!
-
-      if (ctx.debug) {
-        consola.log('load id', id)
-      }
-
-      if (ctx.useSymbolMode) {
-        const symbolPrefixPath = pathe.join(
-          SVG_SPRITE_PREFIX,
-          SpriteMode.Symbol,
-        )
-
-        if (id === symbolPrefixPath) {
-          return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
-            userOptions: ctx.sprites.symbol!,
-            pathname: pathe.join(
-              ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
-              SpriteMode.Symbol,
-              (data.symbol as SvgSpriteSymbolData).sprite,
-            ),
+            check()
           })
         }
 
-        const realId = pathe.join(
-          process.cwd(),
-          `${id.replace(pathe.join(symbolPrefixPath, '/'), '')}.svg`,
-        )
+        await waitSpriteCompiled()
 
-        return transformSymbolItem(realId, {
-          data: data.symbol,
-          userOptions: ctx.sprites.symbol!,
-          transformMap: ctx.store.transformMap,
-        })
+        const { data } = ctx.store.svgSpriteCompiledResult!
+
+        if (ctx.debug) {
+          consola.log('load id', id)
+        }
+
+        if (ctx.useSymbolMode) {
+          const symbolPrefixPath = pathe.join(
+            SVG_SPRITE_PREFIX,
+            SpriteMode.Symbol,
+          )
+
+          if (id === symbolPrefixPath) {
+            return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
+              userOptions: ctx.sprites.symbol!,
+              pathname: pathe.join(
+                ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
+                SpriteMode.Symbol,
+                (data.symbol as SvgSpriteSymbolData).sprite,
+              ),
+            })
+          }
+
+          const realId = pathe.join(
+            process.cwd(),
+            `${id.replace(pathe.join(symbolPrefixPath, '/'), '')}.svg`,
+          )
+
+          return transformSymbolItem(realId, {
+            data: data.symbol,
+            userOptions: ctx.sprites.symbol!,
+            transformMap: ctx.store.transformMap,
+          })
+        }
+      } catch (err) {
+        consola.error(err)
       }
     },
   }
