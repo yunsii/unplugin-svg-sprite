@@ -15,11 +15,7 @@ export default createUnplugin<Options>((options) => {
   return {
     name: PLUGIN_NAME,
     buildStart: async () => {
-      try {
-        await ctx.scanDirs()
-      } catch (err) {
-        logger.error(err)
-      }
+      await ctx.scanDirs()
     },
     resolveId(id: string) {
       if (ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)) {
@@ -32,71 +28,65 @@ export default createUnplugin<Options>((options) => {
     },
     async load(id) {
       logger.debug('Got load id', id)
-      try {
-        function waitSpriteCompiled() {
-          return new Promise<void>((resolve, reject) => {
-            if (ctx.store.svgSpriteCompiledResult) {
-              resolve()
-            }
-
-            let count = 0
-
-            function check() {
-              setTimeout(() => {
-                count += 1
-                if (ctx.store.svgSpriteCompiledResult) {
-                  resolve()
-                  return
-                }
-
-                if (count >= 60) {
-                  reject(
-                    new Error(`Compile by svg-sprite timeout of ${count}s`),
-                  )
-                }
-
-                check()
-              }, 1e3)
-            }
-
-            check()
-          })
-        }
-
-        await waitSpriteCompiled()
-
-        const { data } = ctx.store.svgSpriteCompiledResult!
-
-        if (ctx.useSymbolMode) {
-          const symbolPrefixPath = pathe.join(
-            SVG_SPRITE_PREFIX,
-            SpriteMode.Symbol,
-          )
-
-          if (id === symbolPrefixPath) {
-            return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
-              userOptions: ctx.sprites.symbol!,
-              pathname: pathe.join(
-                ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
-                SpriteMode.Symbol,
-                (data.symbol as SvgSpriteSymbolData).sprite,
-              ),
-            })
+      function waitSpriteCompiled() {
+        return new Promise<void>((resolve, reject) => {
+          if (ctx.store.svgSpriteCompiledResult) {
+            resolve()
           }
 
-          const realId = pathe.join(
-            process.cwd(),
-            `${id.replace(pathe.join(symbolPrefixPath, '/'), '')}.svg`,
-          )
+          let count = 0
 
-          return transformSymbolItem(realId, {
-            data: data.symbol,
+          function check() {
+            setTimeout(() => {
+              count += 1
+              if (ctx.store.svgSpriteCompiledResult) {
+                resolve()
+                return
+              }
+
+              if (count >= 60) {
+                reject(new Error(`Compile by svg-sprite timeout of ${count}s`))
+              }
+
+              check()
+            }, 1e3)
+          }
+
+          check()
+        })
+      }
+
+      await waitSpriteCompiled()
+
+      const { data } = ctx.store.svgSpriteCompiledResult!
+
+      if (ctx.useSymbolMode) {
+        const symbolPrefixPath = pathe.join(
+          SVG_SPRITE_PREFIX,
+          SpriteMode.Symbol,
+        )
+
+        if (id === symbolPrefixPath) {
+          return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
             userOptions: ctx.sprites.symbol!,
-            transformMap: ctx.store.transformMap,
+            pathname: pathe.join(
+              ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
+              SpriteMode.Symbol,
+              (data.symbol as SvgSpriteSymbolData).sprite,
+            ),
           })
         }
-      } catch (err) {
-        logger.error(err)
+
+        const realId = pathe.join(
+          process.cwd(),
+          `${id.replace(pathe.join(symbolPrefixPath, '/'), '')}.svg`,
+        )
+
+        return transformSymbolItem(realId, {
+          data: data.symbol,
+          userOptions: ctx.sprites.symbol!,
+          transformMap: ctx.store.transformMap,
+        })
       }
     },
   }
