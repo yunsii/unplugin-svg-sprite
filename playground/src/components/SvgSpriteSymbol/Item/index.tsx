@@ -13,7 +13,11 @@ const SvgSpriteItem = (
   const { item, ...rest } = props
 
   return (
-    <svg ref={ref} {...rest}>
+    <svg
+      ref={ref}
+      {...rest}
+      viewBox={`0 0 ${item.width.outer} ${item.height.outer}`}
+    >
       <use xlinkHref={item.xlinkHref} />
     </svg>
   )
