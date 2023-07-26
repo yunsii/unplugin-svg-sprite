@@ -1,15 +1,23 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import type React from 'react'
 
 export interface ISvgSpriteItemProps {
   domStr: string
+  pathname: string
 }
 
 const SvgSpriteSymbol: React.FC<ISvgSpriteItemProps> = (props) => {
-  const { domStr } = props
+  const { domStr: _domStr, pathname } = props
+
+  const [domStr, setDomStr] = useState(_domStr)
+  const fetchingRef = useRef(false)
 
   useEffect(() => {
+    if (!domStr) {
+      return
+    }
+
     const div = document.createElement('div')
     div.innerHTML = domStr
 
@@ -32,6 +40,27 @@ const SvgSpriteSymbol: React.FC<ISvgSpriteItemProps> = (props) => {
       document.body.removeChild(targetSvg)
     }
   }, [domStr])
+
+  useEffect(() => {
+    if (!pathname) {
+      return
+    }
+
+    async function run() {
+      if (fetchingRef.current) {
+        return
+      }
+      fetchingRef.current = true
+      const response = await fetch(pathname)
+
+      if (response.ok) {
+        const data = await response.text()
+        setDomStr(data)
+      }
+    }
+
+    run()
+  }, [pathname])
 
   return null
 }

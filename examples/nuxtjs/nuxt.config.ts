@@ -28,14 +28,6 @@ export default defineNuxtConfig({
                 'symbol',
                 'sprite-generator.mjs',
               ),
-              normalizeModuleType: (module: string) => {
-                return `
-                    declare module '${module}' {
-                      const SvgSpriteSymbol: (props: SVGAttributes & ReservedProps) => any
-                      export default SvgSpriteSymbol
-                    }
-                  `
-              },
             },
           },
           stack: {

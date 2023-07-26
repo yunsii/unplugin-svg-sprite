@@ -1,6 +1,6 @@
 import dedent from 'dedent'
 
-export default function generator({ domStr, cwd }) {
+export default function generator({ cwd, domStr, ...rest }) {
   return dedent`
     import SvgSpriteSymbol from '${cwd}/components/SvgSpriteSymbol'
 
@@ -10,11 +10,11 @@ export default function generator({ domStr, cwd }) {
       },
       data() {
         return {
-          domStr: \`${domStr}\`
+          spriteProps: { domStr: \`${domStr}\`, ...${JSON.stringify(rest)}}
         }
       },
       template: \`
-        <SvgSpriteSymbol v-bind:domStr="domStr" />
+        <SvgSpriteSymbol v-bind:spriteProps="spriteProps" />
       \`
     }
   `

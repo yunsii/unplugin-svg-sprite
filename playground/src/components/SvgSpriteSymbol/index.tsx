@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import type React from 'react'
 
@@ -11,6 +11,7 @@ const SvgSpriteSymbol: React.FC<ISvgSpriteItemProps> = (props) => {
   const { domStr: _domStr, pathname } = props
 
   const [domStr, setDomStr] = useState(_domStr)
+  const fetchingRef = useRef(false)
 
   useEffect(() => {
     if (!domStr) {
@@ -46,6 +47,10 @@ const SvgSpriteSymbol: React.FC<ISvgSpriteItemProps> = (props) => {
     }
 
     async function run() {
+      if (fetchingRef.current) {
+        return
+      }
+      fetchingRef.current = true
       const response = await fetch(pathname)
 
       if (response.ok) {

@@ -2,7 +2,6 @@
   <SymbolSprite />
   <div>
     <img src="~/assets/vercel.svg" alt="Discover Nuxt 3" style="width: 48px" />
-    <VercelSvg />
     <ViteSvg />
     <ReactSvg />
     <VercelSvg />
@@ -12,8 +11,8 @@
 
 <script setup>
 import SymbolSprite from '~svg-sprite/symbol'
-import VercelSvg from '~svg-sprite/symbol/assets/vercel'
-import ViteSvg from '~svg-sprite/symbol/assets/raw/vite'
-import ReactSvg from '~svg-sprite/symbol/assets/raw/react'
-import VercelCopySvg from '~svg-sprite/symbol/assets/vercel'
+import VercelSvg from '@/assets/vercel.svg?symbol'
+import ViteSvg from '@/assets/raw/vite.svg?symbol'
+import ReactSvg from '@/assets/raw/react.svg?symbol'
+import VercelCopySvg from '@/assets/vercel.svg?symbol'
 </script>

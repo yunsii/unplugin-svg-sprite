@@ -3,6 +3,7 @@ import pathe from 'pathe'
 
 import { logger } from '../../log'
 
+import type { SvgSpriteCompiledResult, TransformData } from '../ctx'
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
 export async function transformSymbolSprite(
@@ -55,25 +56,35 @@ export async function transformSymbolSprite(
 export async function transformSymbolItem(
   svgAbsolutePath: string,
   context: {
-    data: SvgSpriteSymbolData
+    compiledResult: SvgSpriteCompiledResult
     userOptions: SymbolSpriteOptions
-    transformMap: Record<string, string>
+    transformData: TransformData
+    staticPathname: string
   },
 ) {
-  const { data, userOptions, transformMap } = context
+  const { compiledResult, userOptions, transformData, staticPathname } = context
 
+  const data: SvgSpriteSymbolData =
+    transformData.type === 'static'
+      ? compiledResult.static.data.symbol
+      : compiledResult.dynamic.data.symbol
   const shapes = data.shapes
 
-  const target = shapes.find(
-    (item) => item.name === transformMap[svgAbsolutePath],
-  )
+  const target = shapes.find((item) => item.name === transformData.runtimeId)
 
   if (!target) {
-    throw new Error(`svg [${svgAbsolutePath}] not found`)
+    throw new Error(`target shape of [${svgAbsolutePath}] not found`)
+  }
+
+  const getXLink = () => {
+    if (transformData.type === 'dynamic') {
+      return `#${target.name}`
+    }
+    return `${staticPathname}#${target.name}`
   }
 
   const result = {
-    id: target.name,
+    xlinkHref: getXLink(),
     width: target.width,
     height: target.height,
   }
@@ -81,6 +92,7 @@ export async function transformSymbolItem(
   const itemGeneratorPath = `file:///${pathe.normalize(
     userOptions.runtime.itemGenerator,
   )}`
+
   logger.debug('Const itemGeneratorPath', itemGeneratorPath)
 
   const _itemGenerator = await import(itemGeneratorPath)
@@ -101,6 +113,5 @@ export async function transformSymbolItem(
     item: result,
     cwd,
   })
-
   return { code: transformedCode, map: null }
 }

@@ -13,7 +13,7 @@ export default {
   },
   data() {
     return {
-      href: `#${this.item.id}`,
+      href: this.item.xlinkHref,
     }
   },
   mounted() {

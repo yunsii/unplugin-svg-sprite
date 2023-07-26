@@ -1,13 +1,12 @@
-import type SVGSpriter from 'svg-sprite'
 import type { JsonObject } from 'type-fest'
+import type SVGSpriter from 'svg-sprite'
 import type { ModeConfig } from 'svg-sprite'
 
 export interface SymbolSpriteOptions extends ModeConfig {
   runtime: {
     itemGenerator: string
     spriteGenerator: string
-    /** 标准化雪碧图中模块类型，不指定类型为 any */
-    normalizeModuleType?: (module: string) => string
+    dynamicSvgNodes?: string[]
     /**
      * 默认直接返回形如下列结构的雪碧图字符串 **domStr** 给到 `spriteGenerator`：
      *
@@ -117,5 +116,5 @@ export interface SvgSpriteViewItem
 
 export interface SvgSpriteSymbolItem
   extends Pick<SvgSpriteSymbolShape, 'width' | 'height'> {
-  id: string
+  xlinkHref: string
 }

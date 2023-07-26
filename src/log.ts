@@ -1,7 +1,7 @@
 import consola from 'consola'
 
-import { PLUGIN_ATTR } from './core/constants'
+import { PLUGIN_ABBR } from './core/constants'
 
-export const logger = consola.withTag(PLUGIN_ATTR).withDefaults({
+export const logger = consola.withTag(PLUGIN_ABBR).withDefaults({
   level: 3,
 })

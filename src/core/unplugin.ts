@@ -1,11 +1,17 @@
 import { createUnplugin } from 'unplugin'
 import pathe from 'pathe'
+import { trimEnd } from 'lodash'
 
 import { logger } from '../log'
 
 import { transformSymbolItem, transformSymbolSprite } from './helpers/symbols'
 import { getContext } from './ctx'
-import { PLUGIN_NAME, SVG_SPRITE_PREFIX, SpriteMode } from './constants'
+import {
+  PLUGIN_NAME,
+  SVG_SPRITE_PREFIX,
+  SVG_SPRITE_SYMBOL,
+  SpriteMode,
+} from './constants'
 
 import type { Options, SvgSpriteSymbolData } from '../types'
 
@@ -28,66 +34,52 @@ export default createUnplugin<Options>((options) => {
     },
     async load(id) {
       logger.debug('Got load id', id)
-      function waitSpriteCompiled() {
-        return new Promise<void>((resolve, reject) => {
-          if (ctx.store.svgSpriteCompiledResult) {
-            resolve()
-          }
 
-          let count = 0
+      await ctx.waitSpriteCompiled()
 
-          function check() {
-            setTimeout(() => {
-              count += 1
-              if (ctx.store.svgSpriteCompiledResult) {
-                resolve()
-                return
-              }
+      // 只有动态雪碧图才需要加载运行时通过 JS 加载雪碧图本体
+      const { data } = ctx.store.svgSpriteCompiledResult!.dynamic
 
-              if (count >= 60) {
-                reject(new Error(`Compile by svg-sprite timeout of ${count}s`))
-              }
-
-              check()
-            }, 1e3)
-          }
-
-          check()
-        })
-      }
-
-      await waitSpriteCompiled()
-
-      const { data } = ctx.store.svgSpriteCompiledResult!
-
-      if (ctx.useSymbolMode) {
-        const symbolPrefixPath = pathe.join(
-          SVG_SPRITE_PREFIX,
-          SpriteMode.Symbol,
-        )
-
-        if (id === symbolPrefixPath) {
-          return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
-            userOptions: ctx.sprites.symbol!,
-            pathname: pathe.join(
-              ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
-              SpriteMode.Symbol,
-              (data.symbol as SvgSpriteSymbolData).sprite,
-            ),
-          })
-        }
-
-        const realId = pathe.join(
-          process.cwd(),
-          `${id.replace(pathe.join(symbolPrefixPath, '/'), '')}.svg`,
-        )
-
-        return transformSymbolItem(realId, {
-          data: data.symbol,
+      if (ctx.useSymbolMode && id === SVG_SPRITE_SYMBOL) {
+        return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
           userOptions: ctx.sprites.symbol!,
-          transformMap: ctx.store.transformMap,
+          pathname: pathe.join(
+            ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
+            'dynamic',
+            SpriteMode.Symbol,
+            (data.symbol as SvgSpriteSymbolData).sprite,
+          ),
         })
       }
+    },
+    transformInclude(id) {
+      return ctx.useSymbolMode && id.endsWith('.svg?symbol')
+    },
+    async transform(_, id) {
+      logger.debug('Got transform id', id)
+      const realId = trimEnd(id, '?symbol')
+      await ctx.waitSpriteCompiled()
+      const target = ctx.store.transformMap.get(realId)
+
+      if (!target) {
+        throw new Error(`svg sprite [${id}] not found`)
+      }
+
+      const compiledResult = ctx.store.svgSpriteCompiledResult!
+      const staticPathname = pathe.join(
+        ctx.absoluteOutputPath.replace(ctx.absolutePublicPath, ''),
+        'static',
+        SpriteMode.Symbol,
+        (compiledResult.static.data.symbol as SvgSpriteSymbolData).sprite,
+      )
+
+      logger.debug(`Static pathname: ${staticPathname}`)
+      return transformSymbolItem(realId, {
+        compiledResult,
+        userOptions: ctx.sprites.symbol!,
+        transformData: target,
+        staticPathname,
+      })
     },
   }
 })

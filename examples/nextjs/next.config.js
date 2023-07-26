@@ -26,13 +26,10 @@ const nextConfig = {
                 'symbol',
                 'sprite-generator.mjs',
               ),
-              normalizeModuleType: (module) => {
-                return `
-                    declare module '${module}' {
-                      const SvgSpriteSymbol: (props: React.SVGProps<SVGSVGElement>) => React.ReactNode
-                      export default SvgSpriteSymbol
-                    }
-                  `
+              transformSpriteData: (raw, pathname) => {
+                return {
+                  pathname,
+                }
               },
             },
           },
