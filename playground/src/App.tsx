@@ -1,8 +1,8 @@
 import SymbolSprite from '~svg-sprite/symbol'
-import ViteSvg from '@/assets/raw/vite.svg?symbol'
-import ReactSvg from '@/assets/raw/react.svg?symbol'
-import VercelSvg from '@/assets/raw/vercel.svg?symbol'
-import VercelCopySvg from '@/assets/vercel.svg?symbol'
+import ViteSvg from '@/assets/raw/vite.svg'
+import ReactSvg from '@/assets/raw/react.svg'
+import VercelSvg from '@/assets/raw/vercel.svg'
+import VercelCopySvg from '@/assets/vercel.svg'
 
 import './App.less'
 

@@ -1,6 +1,5 @@
 import { createUnplugin } from 'unplugin'
 import pathe from 'pathe'
-import { trimEnd } from 'lodash'
 
 import { logger } from '../log'
 
@@ -53,13 +52,12 @@ export default createUnplugin<Options>((options) => {
       }
     },
     transformInclude(id) {
-      return ctx.useSymbolMode && id.endsWith('.svg?symbol')
+      return ctx.useSymbolMode && id.endsWith('.svg')
     },
     async transform(_, id) {
       logger.debug('Got transform id', id)
-      const realId = trimEnd(id, '?symbol')
       await ctx.waitSpriteCompiled()
-      const target = ctx.store.transformMap.get(realId)
+      const target = ctx.store.transformMap.get(id)
 
       if (!target) {
         throw new Error(`svg sprite [${id}] not found`)
@@ -74,7 +72,7 @@ export default createUnplugin<Options>((options) => {
       )
 
       logger.debug(`Static pathname: ${staticPathname}`)
-      return transformSymbolItem(realId, {
+      return transformSymbolItem(id, {
         compiledResult,
         userOptions: ctx.sprites.symbol!,
         transformData: target,
