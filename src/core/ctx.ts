@@ -80,8 +80,14 @@ export function createContext(options: Options) {
   const isDynamicSvg = (svgStr: string) => {
     return [
       'linearGradient',
+      'radialGradient',
+      'filter',
+      'clipPath',
       ...(options.sprites.symbol?.runtime.dynamicSvgNodes || []),
-    ].some((item) => svgStr.includes(item))
+    ].some((item) => {
+      // 简单判断一下是否存在相关节点
+      return svgStr.includes(`<${item}`)
+    })
   }
 
   const scanDirs = async () => {

@@ -6,6 +6,13 @@ export interface SymbolSpriteOptions extends ModeConfig {
   runtime: {
     itemGenerator: string
     spriteGenerator: string
+    /**
+     * 包含哪些节点的 SVG 算是动态 SVG，可添加额外判断条件，以下节点为默认值：
+     * - linearGradient
+     * - radialGradient
+     * - filter
+     * - clipPath
+     */
     dynamicSvgNodes?: string[]
     /**
      * 默认直接返回形如下列结构的雪碧图字符串 **domStr** 给到 `spriteGenerator`：
