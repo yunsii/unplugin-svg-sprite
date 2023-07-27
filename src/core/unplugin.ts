@@ -56,11 +56,13 @@ export default createUnplugin<Options>((options) => {
     },
     async transform(_, id) {
       logger.debug('Got transform id', id)
+      const realId = pathe.normalize(id)
+      logger.debug('Got normalized transform id', realId)
       await ctx.waitSpriteCompiled()
-      const target = ctx.store.transformMap.get(id)
+      const target = ctx.store.transformMap.get(realId)
 
       if (!target) {
-        throw new Error(`svg sprite [${id}] not found`)
+        throw new Error(`svg sprite [${realId}] not found`)
       }
 
       const compiledResult = ctx.store.svgSpriteCompiledResult!
@@ -72,7 +74,7 @@ export default createUnplugin<Options>((options) => {
       )
 
       logger.debug(`Static pathname: ${staticPathname}`)
-      return transformSymbolItem(id, {
+      return transformSymbolItem(realId, {
         compiledResult,
         userOptions: ctx.sprites.symbol!,
         transformData: target,
