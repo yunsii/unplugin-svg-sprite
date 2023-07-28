@@ -290,7 +290,6 @@ export function createContext(options: Options) {
 
   return {
     store,
-    mode: spriterMode,
     content,
     absolutePublicPath,
     absoluteOutputPath,
