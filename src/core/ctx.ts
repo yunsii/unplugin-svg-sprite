@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 
-import { get, isPlainObject } from 'lodash'
+import { get, isPlainObject, omitBy } from 'lodash'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
@@ -14,10 +14,12 @@ import type { Options } from '../types'
 export interface TransformData {
   type: 'static' | 'dynamic'
   svgStr: string
+  hash: string
   svgHashPath: string
   runtimeId: string
 }
 
+/** 文件绝对路径及其详情状态 */
 export type TransformMap = Map<string, TransformData>
 
 export interface SvgSpriteCompiledResult {
@@ -57,10 +59,10 @@ export function createContext(options: Options) {
   const absoluteOutputPath = pathe.join(absolutePublicPath, outputDir)
   const absoluteOutputStaticPath = pathe.join(absoluteOutputPath, 'static')
   const absoluteOutputDynamicPath = pathe.join(absoluteOutputPath, 'dynamic')
-  const userMode = Object.keys(sprites)
+  const userModes = Object.keys(sprites)
   const useSymbolMode = 'symbol' in sprites
 
-  const mode = userMode.reduce((prev, current) => {
+  const spriterMode = userModes.reduce((prev, current) => {
     const userCurrentConfig = get(sprites, [current])
     const mergedConfig = isPlainObject(userCurrentConfig)
       ? userCurrentConfig
@@ -77,6 +79,7 @@ export function createContext(options: Options) {
   }, {} as SVGSpriter.Mode)
 
   const isDynamicSvg = (svgStr: string) => {
+    // ref: https://stackoverflow.com/a/74173265/8335317
     return [
       'linearGradient',
       'radialGradient',
@@ -133,6 +136,7 @@ export function createContext(options: Options) {
         store.transformMap.set(item, {
           type,
           svgStr,
+          hash,
           svgHashPath,
           runtimeId: svgId,
         })
@@ -152,13 +156,13 @@ export function createContext(options: Options) {
     const staticSpriter = new SVGSpriter({
       ...spriterConfig,
       dest: absoluteOutputStaticPath,
-      mode,
+      mode: spriterMode,
     })
 
     const dynamicSpriter = new SVGSpriter({
       ...spriterConfig,
       dest: absoluteOutputDynamicPath,
-      mode,
+      mode: spriterMode,
     })
 
     store.transformMap.forEach((value) => {
@@ -213,9 +217,45 @@ export function createContext(options: Options) {
         }
       }
     }
+    function stat() {
+      return Array.from(store.transformMap).reduce(
+        (prev, [key, value]) => {
+          const grouped = Object.keys(prev).find((item) => {
+            return value.hash === item
+          })
+          if (grouped) {
+            prev[grouped] = [...prev[grouped], key]
+            return prev
+          }
+          return {
+            ...prev,
+            [value.hash]: [key],
+          }
+        },
+        // 文件 hash 与文件 hash 相同的文件路径数组
+        {} as Record<string, string[]>,
+      )
+    }
+
+    function printStat() {
+      const result = omitBy(stat(), (value) => value.length <= 1)
+      if (result) {
+        const format = Object.keys(result).reduce((prev, current) => {
+          prev += `🤖 ${current}\n`
+          prev += `  - ${result[current].join('\n  - ')}\n`
+          return prev
+        }, '\n')
+        logger.log(format)
+      } else {
+        logger.log('No svg files similarity > 80%')
+      }
+    }
 
     await Promise.all([writeStaticFiles(), writeDynamicFiles()])
     logger.debug('Write sprite files end')
+    logger.debug('Svg stat start')
+    printStat()
+    logger.debug('Svg stat end')
 
     store.compileComplete = true
   }
@@ -250,7 +290,7 @@ export function createContext(options: Options) {
 
   return {
     store,
-    mode,
+    mode: spriterMode,
     content,
     absolutePublicPath,
     absoluteOutputPath,
