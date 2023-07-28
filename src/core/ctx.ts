@@ -5,8 +5,7 @@ import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
 
-import { logger } from '../log'
-
+import { logger } from './log'
 import { OUTPUT_DIR, SpriteMode } from './constants'
 
 import type { BufferFile } from 'vinyl'

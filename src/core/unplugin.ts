@@ -1,8 +1,7 @@
 import { createUnplugin } from 'unplugin'
 import pathe from 'pathe'
 
-import { logger } from '../log'
-
+import { logger } from './log'
 import { transformSymbolItem, transformSymbolSprite } from './helpers/symbols'
 import { getContext } from './ctx'
 import {

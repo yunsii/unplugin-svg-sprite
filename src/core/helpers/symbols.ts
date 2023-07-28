@@ -1,7 +1,7 @@
 import dedent from 'dedent'
 import pathe from 'pathe'
 
-import { logger } from '../../log'
+import { logger } from '../log'
 
 import type { SvgSpriteCompiledResult, TransformData } from '../ctx'
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
