@@ -35,11 +35,6 @@ export default defineConfig({
               'symbol',
               'sprite-generator.mjs',
             ),
-            transformSpriteData: (raw, pathname) => {
-              return {
-                pathname,
-              }
-            },
           },
         },
         stack: {

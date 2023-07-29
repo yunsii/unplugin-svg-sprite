@@ -7,6 +7,7 @@ export async function transformSymbolSprite(
   data: SvgSpriteSymbolData,
   context: {
     userOptions: SymbolSpriteOptions
+    /** SVG symbol sprite public pathname */
     pathname: string
   },
 ) {
@@ -26,14 +27,16 @@ export async function transformSymbolSprite(
     throw new TypeError('Please export valid sprite generator function')
   }
 
+  const defaultDomStr = `
+    <svg width="0" height="0" style="position:absolute">
+      ${data.shapes.map((item) => item.svg).join('')}
+    </svg>
+  `.replace(/\n/g, '')
+
   const spriteProps = userOptions.runtime.transformSpriteData
-    ? userOptions.runtime.transformSpriteData(data, pathname)
+    ? userOptions.runtime.transformSpriteData(pathname, defaultDomStr, data)
     : {
-        domStr: `
-          <svg width="0" height="0" style="position:absolute">
-            ${data.shapes.map((item) => item.svg).join('')}
-          </svg>
-        `.replace(/\n/g, ''),
+        pathname,
       }
 
   const cwd = pathe.normalize(process.cwd())

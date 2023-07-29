@@ -28,11 +28,6 @@ export default defineNuxtConfig({
                 'symbol',
                 'sprite-generator.mjs',
               ),
-              transformSpriteData: (raw: any, pathname: string) => {
-                return {
-                  pathname,
-                }
-              },
             },
           },
           stack: {

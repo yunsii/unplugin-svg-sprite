@@ -26,11 +26,6 @@ const nextConfig = {
                 'symbol',
                 'sprite-generator.mjs',
               ),
-              transformSpriteData: (raw, pathname) => {
-                return {
-                  pathname,
-                }
-              },
             },
           },
           stack: {

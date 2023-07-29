@@ -15,22 +15,25 @@ export interface SymbolSpriteOptions extends ModeConfig {
      * - radialGradient
      * - filter
      * - clipPath
+     *
+     * ref: https://stackoverflow.com/a/74173265/8335317
      */
     dynamicSvgNodes?: string[]
     /**
-     * Default **domStr**：
+     * If you want inject SVG sprite directly, you can format dom string like:
      *
-     * ```
-     * <svg width="0" height="0" style="position:absolute">
-     *  // <symbol>...</symbol/>
-     * </svg>
-     * ```
+     * const domStr = `
+     *   <svg width="0" height="0" style="position:absolute">
+     *     ${data.shapes.map((item) => item.svg).join('')}
+     *   </svg>
+     * `.replace(/\n/g, '')
      *
      * ref: https://github.com/yunsii/unplugin-svg-sprite/blob/main/playground/src/components/SvgSpriteSymbol/index.tsx
      */
     transformSpriteData?: (
-      raw: SvgSpriteSymbolData,
       pathname: string,
+      domStr: string,
+      rawData: SvgSpriteSymbolData,
     ) => JsonObject
   }
 }
@@ -126,6 +129,7 @@ export interface SvgSpriteViewItem
 
 export interface SvgSpriteSymbolProps {
   domStr?: string
+  /** In default, dynamic SVG sprite injected by pathname  */
   pathname?: string
 }
 
