@@ -4,9 +4,11 @@ import { get, isPlainObject, omitBy } from 'lodash'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
+import { consola } from 'consola'
+import { minimatch } from 'minimatch'
 
 import { logger } from './log'
-import { OUTPUT_DIR, SpriteMode } from './constants'
+import { IS_DEV, OUTPUT_DIR, SpriteMode } from './constants'
 
 import type { BufferFile } from 'vinyl'
 import type { Options } from '../types'
@@ -14,7 +16,9 @@ import type { Options } from '../types'
 export interface TransformData {
   type: 'static' | 'dynamic'
   svgStr: string
+  /** 注意，该哈希值是移除 [ \n\t] 后的字符串计算得出 */
   hash: string
+  /** SVG 路径根据文件内容 hash 化 */
   svgHashPath: string
   runtimeId: string
 }
@@ -25,12 +29,6 @@ export type TransformMap = Map<string, TransformData>
 export interface SvgSpriteCompiledResult {
   static: { result: any; data: any }
   dynamic: { result: any; data: any }
-}
-
-const store = {
-  compileComplete: false,
-  transformMap: new Map() as TransformMap,
-  svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
 }
 
 export function createContext(options: Options) {
@@ -72,7 +70,8 @@ export function createContext(options: Options) {
       ...prev,
       [current]: {
         example: debug,
-        bust: true,
+        /** 开发环境雪碧图文件名不做 hash 处理，保证 HMR 不受影响 */
+        bust: !IS_DEV,
         ...mergedConfig,
       },
     }
@@ -92,65 +91,19 @@ export function createContext(options: Options) {
     })
   }
 
-  const scanDirs = async () => {
-    if (store.compileComplete) {
-      logger.debug('Compile completed, skip recompile')
-      return
-    }
+  const contentPatterns = [
+    ...content,
+    `!${publicDir}/${outputDir}`,
+    `!node_modules`,
+  ]
 
-    const { globbySync } = await import('globby')
-
-    const svgFiles = globbySync([
-      ...content,
-      `!${publicDir}/${outputDir}`,
-      `!node_modules`,
-    ])
-
-    let staticCount = 0
-    let dynamicCount = 0
-
-    svgFiles
-      .filter((item) => item.endsWith('.svg'))
-      .map((item) => {
-        return pathe.join(process.cwd(), item)
-      })
-      .forEach((item) => {
-        if (store.transformMap.get(item)) {
-          return
-        }
-
-        const svgStr = fse.readFileSync(item, { encoding: 'utf-8' })
-
-        const hash = crypto
-          .createHash('md5')
-          .update(svgStr, 'utf8')
-          .digest('hex')
-          .slice(0, 8)
-
-        const svgId = `${pathe.parse(item).name}-${hash}`
-
-        const type = isDynamicSvg(svgStr) ? 'dynamic' : 'static'
-
-        const svgHashPath = pathe.join(pathe.dirname(item), `${svgId}.svg`)
-
-        store.transformMap.set(item, {
-          type,
-          svgStr,
-          hash,
-          svgHashPath,
-          runtimeId: svgId,
-        })
-
-        logger.debug(`Find ${type} svg`, item)
-        if (isDynamicSvg(svgStr)) {
-          dynamicCount += 1
-        } else {
-          staticCount += 1
-        }
-      })
-
-    logger.log(`SVG sprite static transform size: ${staticCount}`)
-    logger.log(`SVG sprite dynamic transform size: ${dynamicCount}`)
+  const store = {
+    /** 所有 SVG 缓存对象 */
+    transformMap: new Map() as TransformMap,
+    /** 雪碧图编译结果缓存 */
+    svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
+  }
+  const compile = async () => {
     logger.debug('Spriter compile start...')
 
     const staticSpriter = new SVGSpriter({
@@ -165,13 +118,21 @@ export function createContext(options: Options) {
       mode: spriterMode,
     })
 
+    let staticCount = 0
+    let dynamicCount = 0
+
     store.transformMap.forEach((value) => {
       if (value.type === 'static') {
+        staticCount += 1
         staticSpriter.add(value.svgHashPath, null, value.svgStr)
       } else {
+        dynamicCount += 1
         dynamicSpriter.add(value.svgHashPath, null, value.svgStr)
       }
     })
+
+    logger.log(`SVG sprite static transform size: ${staticCount}`)
+    logger.log(`SVG sprite dynamic transform size: ${dynamicCount}`)
 
     const [staticResult, dynamicResult] = await Promise.all([
       staticSpriter.compileAsync(),
@@ -187,7 +148,7 @@ export function createContext(options: Options) {
     }
 
     logger.debug('Write sprite files start...')
-    await fse.emptyDir(absoluteOutputPath)
+    fse.emptyDirSync(absoluteOutputPath)
 
     async function writeStaticFiles() {
       for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
@@ -239,15 +200,16 @@ export function createContext(options: Options) {
 
     function printStat() {
       const result = omitBy(stat(), (value) => value.length <= 1)
-      if (result) {
+      if (Object.keys(result).length) {
+        logger.log('There are same files have same file hash:')
         const format = Object.keys(result).reduce((prev, current) => {
           prev += `🤖 ${current}\n`
           prev += `  - ${result[current].join('\n  - ')}\n`
           return prev
         }, '\n')
-        logger.log(format)
+        consola.log(format)
       } else {
-        logger.log('No svg files similarity > 80%')
+        logger.log('No duplicate svg files')
       }
     }
 
@@ -256,8 +218,62 @@ export function createContext(options: Options) {
     logger.debug('Svg stat start')
     printStat()
     logger.debug('Svg stat end')
+  }
 
-    store.compileComplete = true
+  const upsertSvg = (path: string, _map: TransformMap, watch = false) => {
+    const svgStr = fse.readFileSync(path, { encoding: 'utf-8' })
+
+    const hash = crypto
+      .createHash('md5')
+      .update(svgStr.replace(/[ \n\t]/g, ''), 'utf8')
+      .digest('hex')
+      .slice(0, 8)
+
+    const svgId = `${pathe.parse(path).name}-${hash}`
+
+    const type = isDynamicSvg(svgStr) ? 'dynamic' : 'static'
+
+    const svgHashPath = pathe.join(pathe.dirname(path), `${svgId}.svg`)
+
+    if (_map.get(path)) {
+      logger.log(`Update ${type} svg`, path)
+    } else {
+      if (watch) {
+        logger.log(`Add ${type} svg`, path)
+      } else {
+        logger.debug(`Add ${type} svg`, path)
+      }
+    }
+
+    _map.set(path, {
+      type,
+      svgStr,
+      hash,
+      svgHashPath,
+      runtimeId: svgId,
+    })
+  }
+
+  const scanDirs = async () => {
+    const { globbySync } = await import('globby')
+    const svgFiles = globbySync(contentPatterns)
+
+    logger.debug('Match files:', svgFiles.length)
+
+    const _transformMap = new Map() as TransformMap
+
+    svgFiles
+      .filter((item) => item.endsWith('.svg'))
+      .map((item) => {
+        return pathe.join(process.cwd(), item)
+      })
+      .forEach((item) => {
+        upsertSvg(item, _transformMap)
+      })
+
+    store.transformMap = _transformMap
+
+    await compile()
   }
 
   function waitSpriteCompiled() {
@@ -288,18 +304,60 @@ export function createContext(options: Options) {
     })
   }
 
+  const timer: Record<string, NodeJS.Timeout> = {}
+
+  const handleSvgUpsert = (path: string) => {
+    const relativePath = pathe.relative(process.cwd(), path)
+    if (
+      contentPatterns
+        .map((item) => minimatch(relativePath, item))
+        .every((item) => item === true)
+    ) {
+      clearTimeout(timer[path])
+      timer[path] = setTimeout(() => {
+        upsertSvg(path, store.transformMap, true)
+        compile()
+        delete timer[path]
+      })
+    }
+  }
+
+  const handleSvgUnlink = (path: string) => {
+    const relativePath = pathe.relative(process.cwd(), path)
+    const type = store.transformMap.get(path)?.type
+    if (
+      contentPatterns
+        .map((item) => minimatch(relativePath, item))
+        .every((item) => item === true) &&
+      type
+    ) {
+      store.transformMap.delete(path)
+      logger.log(`Delete ${type} svg`, path)
+      compile()
+    }
+  }
+
   return {
-    store,
-    content,
-    absolutePublicPath,
-    absoluteOutputPath,
-    outputDir,
     sprites,
+    /** 是否启用 symbol 雪碧图 */
     useSymbolMode,
-    debug,
-    scanDirs,
-    isDynamicSvg,
-    waitSpriteCompiled,
+    /** SVG 路径 Glob 表达式集 */
+    contentPatterns,
+    store,
+    path: {
+      publicDir,
+      outputDir,
+      absolutePublicPath,
+      absoluteOutputPath,
+    },
+    api: {
+      scanDirs,
+      compile,
+      isDynamicSvg,
+      waitSpriteCompiled,
+      handleSvgUpsert,
+      handleSvgUnlink,
+    },
   }
 }
 

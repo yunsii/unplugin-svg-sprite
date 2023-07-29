@@ -1,8 +1,6 @@
 import dedent from 'dedent'
 import pathe from 'pathe'
 
-import { logger } from '../log'
-
 import type { SvgSpriteCompiledResult, TransformData } from '../ctx'
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
@@ -18,7 +16,6 @@ export async function transformSymbolSprite(
   const spriteGeneratorPath = `file:///${pathe.normalize(
     userOptions.runtime.spriteGenerator,
   )}`
-  logger.debug('Const spriteGeneratorPath', spriteGeneratorPath)
   const _spriteGenerator = await import(spriteGeneratorPath)
 
   const spriteGenerator =
@@ -40,10 +37,7 @@ export async function transformSymbolSprite(
       `,
       }
 
-  logger.debug('Const spriteProps', spriteProps)
-
   const cwd = pathe.normalize(process.cwd())
-  logger.debug('Print cwd', cwd)
 
   const transformedCode = spriteGenerator({
     ...spriteProps,
@@ -76,7 +70,7 @@ export async function transformSymbolItem(
     throw new Error(`target shape of [${svgAbsolutePath}] not found`)
   }
 
-  const getXLink = () => {
+  const getHref = () => {
     if (transformData.type === 'dynamic') {
       return `#${target.name}`
     }
@@ -84,7 +78,7 @@ export async function transformSymbolItem(
   }
 
   const result = {
-    xlinkHref: getXLink(),
+    href: getHref(),
     width: target.width,
     height: target.height,
   }
@@ -92,8 +86,6 @@ export async function transformSymbolItem(
   const itemGeneratorPath = `file:///${pathe.normalize(
     userOptions.runtime.itemGenerator,
   )}`
-
-  logger.debug('Const itemGeneratorPath', itemGeneratorPath)
 
   const _itemGenerator = await import(itemGeneratorPath)
 
@@ -107,11 +99,10 @@ export async function transformSymbolItem(
   }
 
   const cwd = pathe.normalize(process.cwd())
-  logger.debug('Print cwd', cwd)
-
   const transformedCode = itemGenerator({
     item: result,
     cwd,
   })
+
   return { code: transformedCode, map: null }
 }
