@@ -1,4 +1,3 @@
-import dedent from 'dedent'
 import pathe from 'pathe'
 
 import type { SvgSpriteCompiledResult, TransformData } from '../ctx'
@@ -30,11 +29,11 @@ export async function transformSymbolSprite(
   const spriteProps = userOptions.runtime.transformSpriteData
     ? userOptions.runtime.transformSpriteData(data, pathname)
     : {
-        domStr: dedent`
+        domStr: `
           <svg width="0" height="0" style="position:absolute">
             ${data.shapes.map((item) => item.svg).join('')}
           </svg>
-      `,
+        `.replace(/\n/g, ''),
       }
 
   const cwd = pathe.normalize(process.cwd())

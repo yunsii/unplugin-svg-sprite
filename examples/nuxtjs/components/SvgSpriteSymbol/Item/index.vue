@@ -1,23 +1,15 @@
 <template>
   <svg>
-    <use v-bind:xlink:href="this.href" />
+    <use :href="props.item.href" :xlink:href="props.item.href" />
   </svg>
 </template>
 
-<script>
-export default {
-  props: {
-    item: {
-      type: Object,
-    },
-  },
-  data() {
-    return {
-      href: this.item.xlinkHref,
-    }
-  },
-  mounted() {
-    console.log('this.item', this.item)
-  },
-}
+<script setup lang="ts">
+import type { SvgSpriteSymbolItemProps } from '../../../../../src/types'
+
+const props = defineProps<SvgSpriteSymbolItemProps>()
+
+onMounted(() => {
+  console.log('props.item', props.item)
+})
 </script>

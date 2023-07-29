@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
+import type { SvgSpriteSymbolProps } from '../../../../../src/types'
 import type React from 'react'
 
-export interface ISvgSpriteItemProps {
-  domStr: string
-  pathname: string
-}
-
-const SvgSpriteSymbol: React.FC<ISvgSpriteItemProps> = (props) => {
+const SvgSpriteSymbol: React.FC<SvgSpriteSymbolProps> = (props) => {
   const { domStr: _domStr, pathname } = props
 
   const [domStr, setDomStr] = useState(_domStr)
@@ -42,11 +38,10 @@ const SvgSpriteSymbol: React.FC<ISvgSpriteItemProps> = (props) => {
   }, [domStr])
 
   useEffect(() => {
-    if (!pathname) {
-      return
-    }
-
     async function run() {
+      if (!pathname) {
+        return
+      }
       if (fetchingRef.current) {
         return
       }

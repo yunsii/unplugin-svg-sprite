@@ -1,7 +1,7 @@
 <template>
   <SymbolSprite />
   <div>
-    <img src="~/assets/vercel.svg" alt="Discover Nuxt 3" style="width: 48px" />
+    <img src="/assets/vercel.svg" alt="Discover Nuxt 3" style="width: 48px" />
     <ViteSvg />
     <ReactSvg />
     <VercelSvg />
