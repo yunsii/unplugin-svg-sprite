@@ -1,6 +1,6 @@
 # unplugin-svg-sprite
 
-[![NPM version](https://img.shields.io/npm/v/unplugin-svg-sprite?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-svg-sprite)
+[![NPM version](https://img.shields.io/npm/v/unplugin-svg-sprite?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-svg-sprite) [![NPM download monthly](https://img.shields.io/npm/dm/unplugin-svg-sprite.svg?color=a1b858)](https://www.npmjs.com/package/unplugin-svg-sprite)
 
 ## Install
 
