@@ -7,7 +7,8 @@ export interface SymbolSpriteOptions extends ModeConfig {
     itemGenerator: string
     spriteGenerator: string
     /**
-     * 包含哪些节点的 SVG 算是动态 SVG，可添加额外判断条件，以下节点为默认值：
+     * DYNAMIC svg node conditions, default nodes：
+     *
      * - linearGradient
      * - radialGradient
      * - filter
@@ -15,7 +16,7 @@ export interface SymbolSpriteOptions extends ModeConfig {
      */
     dynamicSvgNodes?: string[]
     /**
-     * 默认直接返回形如下列结构的雪碧图字符串 **domStr** 给到 `spriteGenerator`：
+     * Default **domStr**：
      *
      * ```
      * <svg width="0" height="0" style="position:absolute">
@@ -23,8 +24,7 @@ export interface SymbolSpriteOptions extends ModeConfig {
      * </svg>
      * ```
      *
-     * 如果你想通过外链的方式，可让函数直接返回 `{ pathname }`，此时，应避免再次注入 domStr。
-     * 再在 SvgSpriteSymbol 中处理，参考处理方式 https://github.com/yunsii/unplugin-svg-sprite/blob/main/playground/src/components/SvgSpriteSymbol/index.tsx
+     * ref: https://github.com/yunsii/unplugin-svg-sprite/blob/main/playground/src/components/SvgSpriteSymbol/index.tsx
      */
     transformSpriteData?: (
       raw: SvgSpriteSymbolData,

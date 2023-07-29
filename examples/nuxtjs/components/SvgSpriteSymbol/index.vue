@@ -21,8 +21,8 @@ watch(domStrRef, () => {
   const div = document.createElement('div')
   div.innerHTML = domStrRef.value
 
-  // 如果通过 DOMParser 解析 svg 后挂载 vite.svg 渲染有问题，
-  // 暂不清楚原因。
+  // It will render empty svg icon if mount svg sprite node by DOMParser.
+  // Unclear for the time being.
   const targetSvg = div.querySelector('svg')
 
   if (!targetSvg) {

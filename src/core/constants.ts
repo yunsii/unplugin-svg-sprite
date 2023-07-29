@@ -9,11 +9,6 @@ export enum SpriteMode {
   Stack = 'stack',
 }
 
-/**
- * PREFIX/mode/path
- *
- * ~svg-sprite/symbol/##/#
- */
 export const SVG_SPRITE_PREFIX = `~svg-sprite/`
 
 export const SVG_SPRITE_SYMBOL = `${SVG_SPRITE_PREFIX}symbol`

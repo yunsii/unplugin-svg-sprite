@@ -42,7 +42,7 @@ export default createUnplugin<Options>((options) => {
 
       await ctx.api.waitSpriteCompiled()
 
-      // 只有动态雪碧图才需要加载运行时通过 JS 加载雪碧图本体
+      // Only DYNAMIC sprite need inject sprite DOM
       const { data } = ctx.store.svgSpriteCompiledResult!.dynamic
 
       if (ctx.useSymbolMode && id === SVG_SPRITE_SYMBOL) {

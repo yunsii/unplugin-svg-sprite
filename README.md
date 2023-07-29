@@ -1,8 +1,19 @@
 # unplugin-svg-sprite
 
-[![NPM version](https://img.shields.io/npm/v/unplugin-svg-sprite?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-svg-sprite) [![NPM download monthly](https://img.shields.io/npm/dm/unplugin-svg-sprite.svg?color=a1b858)](https://www.npmjs.com/package/unplugin-svg-sprite)
+[![npm version][npm-version-src]][npm-version-href] [![npm downloads][npm-downloads-src]][npm-downloads-href] [![License][license-src]][license-href]
 
-## Install
+## 🎉 Features
+
+- 🦄 [Unified plugin](https://github.com/unjs/unplugin), support Vite/Rollup/Webpack/Nuxt/esbuild
+- 🚀 Framework-agnostic, use whatever framework you like
+- 😎 Import SVG file directly
+- 😄 HMR supported (Vite/Webpack)
+- 🤖 Detect duplicated SVG files
+- 💎 SSR supported
+
+> [🌱 Try it online](https://stackblitz.com/github/yunsii/unplugin-svg-sprite)
+
+## 👀 Install
 
 ```bash
 npm i unplugin-svg-sprite
@@ -121,7 +132,24 @@ build({
 
 <br></details>
 
-## References
+## 🗺️ Road Map
+
+[Check **todo** issues](https://github.com/yunsii/unplugin-svg-sprite/issues?q=is%3Aopen+label%3Atodo+sort%3Aupdated-desc)
+
+## 📚 References
 
 - [svg-sprite](https://github.com/svg-sprite/svg-sprite)
 - [How SVG Fragment Identifiers Work](https://css-tricks.com/svg-fragment-identifiers-work/)
+
+## License
+
+[MIT](./LICENSE) License © 2023-PRESENT [yunsii](https://github.com/yunsii)
+
+<!-- Badges -->
+
+[npm-version-src]: https://img.shields.io/npm/v/unplugin-svg-sprite?color=a1b858&label=
+[npm-version-href]: https://www.npmjs.com/package/unplugin-svg-sprite
+[npm-downloads-src]: https://img.shields.io/npm/dm/unplugin-svg-sprite.svg?color=a1b858
+[npm-downloads-href]: https://www.npmjs.com/package/unplugin-svg-sprite
+[license-src]: https://img.shields.io/github/license/yunsii/unplugin-svg-sprite.svg?style=flat&colorB=a1b858
+[license-href]: https://github.com/yunsii/unplugin-svg-sprite/blob/main/LICENSE

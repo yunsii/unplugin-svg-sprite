@@ -16,14 +16,14 @@ import type { Options } from '../types'
 export interface TransformData {
   type: 'static' | 'dynamic'
   svgStr: string
-  /** 注意，该哈希值是移除 [ \n\t] 后的字符串计算得出 */
+  /** [Attention] the hash value calculated by remove [ \n\t] */
   hash: string
-  /** SVG 路径根据文件内容 hash 化 */
+  /** SVG full path, svg name with hash postfix */
   svgHashPath: string
   runtimeId: string
 }
 
-/** 文件绝对路径及其详情状态 */
+/** SVG full path and its detail data */
 export type TransformMap = Map<string, TransformData>
 
 export interface SvgSpriteCompiledResult {
@@ -70,7 +70,7 @@ export function createContext(options: Options) {
       ...prev,
       [current]: {
         example: debug,
-        /** 开发环境雪碧图文件名不做 hash 处理，保证 HMR 不受影响 */
+        /** For better HMR, SVG sprite file name without hash in DEV env */
         bust: !IS_DEV,
         ...mergedConfig,
       },
@@ -86,7 +86,6 @@ export function createContext(options: Options) {
       'clipPath',
       ...(options.sprites.symbol?.runtime.dynamicSvgNodes || []),
     ].some((item) => {
-      // 简单判断一下是否存在相关节点
       return svgStr.includes(`<${item}`)
     })
   }
@@ -98,9 +97,8 @@ export function createContext(options: Options) {
   ]
 
   const store = {
-    /** 所有 SVG 缓存对象 */
+    /** All SVG cache map */
     transformMap: new Map() as TransformMap,
-    /** 雪碧图编译结果缓存 */
     svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
   }
   const compile = async () => {
@@ -193,7 +191,7 @@ export function createContext(options: Options) {
             [value.hash]: [key],
           }
         },
-        // 文件 hash 与文件 hash 相同的文件路径数组
+        // a hash with same hash files
         {} as Record<string, string[]>,
       )
     }
@@ -339,9 +337,7 @@ export function createContext(options: Options) {
 
   return {
     sprites,
-    /** 是否启用 symbol 雪碧图 */
     useSymbolMode,
-    /** SVG 路径 Glob 表达式集 */
     contentPatterns,
     store,
     path: {
