@@ -43,6 +43,7 @@ export interface Options {
    * 可自定义 shape.transform: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#shape-transformations
    */
   spriterConfig?: Omit<SVGSpriter.Config, 'dest' | 'mode'>
+  /** 当前支持的雪碧图配置 */
   sprites: {
     symbol?: SymbolSpriteOptions
     /**
@@ -123,5 +124,5 @@ export interface SvgSpriteViewItem
 
 export interface SvgSpriteSymbolItem
   extends Pick<SvgSpriteSymbolShape, 'width' | 'height'> {
-  xlinkHref: string
+  href: string
 }

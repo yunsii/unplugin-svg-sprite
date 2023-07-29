@@ -14,7 +14,7 @@ const SvgSpriteItem = (
 
   return (
     <svg ref={ref} {...rest}>
-      <use xlinkHref={item.xlinkHref} />
+      <use href={item.href} xlinkHref={item.href} />
     </svg>
   )
 }

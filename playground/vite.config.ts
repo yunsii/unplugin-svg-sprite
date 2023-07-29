@@ -3,6 +3,7 @@ import path from 'node:path'
 import { defineConfig } from 'vite'
 import inspect from 'vite-plugin-inspect'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import react from '@vitejs/plugin-react'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment, @typescript-eslint/prefer-ts-expect-error
 // @ts-ignore
@@ -12,6 +13,7 @@ export default defineConfig({
   plugins: [
     inspect(),
     tsconfigPaths(),
+    react(),
     unplugin({
       debug: true,
       content: ['src/assets/**/*.svg'],
