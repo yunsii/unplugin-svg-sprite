@@ -122,7 +122,16 @@ export interface SvgSpriteViewItem
   id: string
 }
 
+export interface SvgSpriteSymbolProps {
+  domStr?: string
+  pathname?: string
+}
+
 export interface SvgSpriteSymbolItem
   extends Pick<SvgSpriteSymbolShape, 'width' | 'height'> {
   href: string
+}
+
+export interface SvgSpriteSymbolItemProps {
+  item: SvgSpriteSymbolItem
 }

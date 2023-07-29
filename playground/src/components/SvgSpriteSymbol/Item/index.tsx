@@ -1,13 +1,9 @@
 import React from 'react'
 
-import type { SvgSpriteSymbolItem } from '../../../../../src/types'
-
-export interface ISvgSpriteItemProps {
-  item: SvgSpriteSymbolItem
-}
+import type { SvgSpriteSymbolItemProps } from '../../../../../src/types'
 
 const SvgSpriteItem = (
-  props: ISvgSpriteItemProps,
+  props: SvgSpriteSymbolItemProps,
   ref: React.LegacyRef<SVGSVGElement>,
 ) => {
   const { item, ...rest } = props
