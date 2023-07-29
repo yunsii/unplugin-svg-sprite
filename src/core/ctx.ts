@@ -59,6 +59,8 @@ export function createContext(options: Options) {
   const absoluteOutputDynamicPath = pathe.join(absoluteOutputPath, 'dynamic')
   const userModes = Object.keys(sprites)
   const useSymbolMode = 'symbol' in sprites
+  const useSymbolResourceQuery =
+    'symbol' in sprites && !!sprites.symbol?.runtime.resourceQuery
 
   const spriterMode = userModes.reduce((prev, current) => {
     const userCurrentConfig = get(sprites, [current])
@@ -338,6 +340,7 @@ export function createContext(options: Options) {
   return {
     sprites,
     useSymbolMode,
+    useSymbolResourceQuery,
     contentPatterns,
     store,
     path: {

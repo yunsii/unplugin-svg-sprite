@@ -6,6 +6,13 @@ declare module '~svg-sprite/symbol' {
 declare module '*.svg' {
   const SvgSpriteSymbol: (
     props: React.SVGProps<SVGSVGElement>,
-  ) => React.ReactNode
+  ) => React.ReactElement
+  export default SvgSpriteSymbol
+}
+
+declare module '*.svg?symbol' {
+  const SvgSpriteSymbol: (
+    props: React.SVGProps<SVGSVGElement>,
+  ) => React.ReactElement
   export default SvgSpriteSymbol
 }

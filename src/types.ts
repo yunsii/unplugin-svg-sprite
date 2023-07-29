@@ -4,6 +4,8 @@ import type { ModeConfig } from 'svg-sprite'
 
 export interface SymbolSpriteOptions extends ModeConfig {
   runtime: {
+    /** Whether use resourceQuery: ?symbol, default: false */
+    resourceQuery?: boolean
     itemGenerator: string
     spriteGenerator: string
     /**

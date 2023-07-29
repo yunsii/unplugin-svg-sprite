@@ -35,38 +35,42 @@ export default createUnplugin<Options>((options) => {
       }
     },
     loadInclude(id) {
-      return ctx.useSymbolMode && id.startsWith(SVG_SPRITE_PREFIX)
+      if (ctx.useSymbolMode) {
+        return id === SVG_SPRITE_SYMBOL
+      }
     },
     async load(id) {
-      logger.debug('Got load id', id)
-
+      const normalizeId = pathe.normalize(id)
+      logger.debug('Got load id', normalizeId)
       await ctx.api.waitSpriteCompiled()
 
       // Only DYNAMIC sprite need inject sprite DOM
       const { data } = ctx.store.svgSpriteCompiledResult!.dynamic
 
-      if (ctx.useSymbolMode && id === SVG_SPRITE_SYMBOL) {
-        return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
-          userOptions: ctx.sprites.symbol!,
-          pathname: pathe.join(
-            ctx.path.absoluteOutputPath.replace(
-              ctx.path.absolutePublicPath,
-              '',
-            ),
-            'dynamic',
-            SpriteMode.Symbol,
-            (data.symbol as SvgSpriteSymbolData).sprite,
-          ),
-        })
-      }
+      return transformSymbolSprite(data.symbol as SvgSpriteSymbolData, {
+        userOptions: ctx.sprites.symbol!,
+        pathname: pathe.join(
+          ctx.path.absoluteOutputPath.replace(ctx.path.absolutePublicPath, ''),
+          'dynamic',
+          SpriteMode.Symbol,
+          (data.symbol as SvgSpriteSymbolData).sprite,
+        ),
+      })
     },
     transformInclude(id) {
-      return ctx.useSymbolMode && id.endsWith('.svg')
+      if (!ctx.useSymbolMode) {
+        return false
+      }
+      return ctx.useSymbolResourceQuery
+        ? id.endsWith('.svg?symbol')
+        : id.endsWith('.svg')
     },
     async transform(_, id) {
-      logger.debug('Got transform id', id)
-      const realId = pathe.normalize(id)
-      logger.debug('Got normalized transform id', realId)
+      const normalizeId = pathe.normalize(id)
+      logger.debug('Got transform id', normalizeId)
+      const realId = ctx.useSymbolResourceQuery
+        ? pathe.normalize(id.replace('.svg?symbol', '.svg'))
+        : normalizeId
       await ctx.api.waitSpriteCompiled()
       const target = ctx.store.transformMap.get(realId)
 
