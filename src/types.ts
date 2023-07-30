@@ -45,10 +45,10 @@ export interface Options {
   /**
    * ref: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#configuration
    *
-   * 可自定义 shape.transform: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#shape-transformations
+   * You can custom shape.transform: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#shape-transformations
    */
   spriterConfig?: Omit<SVGSpriter.Config, 'dest' | 'mode' | 'log'>
-  /** 当前支持的雪碧图配置 */
+  /** Support SVG sprite mode for now */
   sprites: {
     symbol?: SymbolSpriteOptions
     /**
@@ -57,11 +57,7 @@ export interface Options {
     stack?: boolean | ModeConfig
   }
   /**
-   * 是否开启 Debug 模式，默认 false
-   *
-   * 开启后：
-   *
-   * - 输出扫描到的 SVG
+   * Debug mode
    */
   debug?: boolean
 }
@@ -98,7 +94,7 @@ export interface SvgSpriteSymbolShape {
       last: boolean
     }[]
   }
-  /** symbol 节点包裹的 SVG 字符串 */
+  /** svg string wrapped by symbol node */
   svg: string
 }
 
