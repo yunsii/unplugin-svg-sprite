@@ -10,7 +10,6 @@ import { minimatch } from 'minimatch'
 import { logger } from './log'
 import { IS_DEV, OUTPUT_DIR, SpriteMode } from './constants'
 
-import type { Config as SvgoConfig } from 'svgo'
 import type { BufferFile } from 'vinyl'
 import type { Options } from '../types'
 
@@ -51,14 +50,15 @@ export function createContext(options: Options) {
     shape: {
       transform: [
         {
+          // svg-sprite internal logic: https://github.com/svg-sprite/svg-sprite/blob/main/lib/svg-sprite/transform/svgo.js#L48
+          // ref: https://github.com/svg/svgo#configuration
           svgo: {
             plugins: [
               'preset-default',
-              { name: 'cleanupIDs', active: false },
               { name: 'removeDimensions', active: true },
               { name: 'removeViewBox', active: false },
             ],
-          } as SvgoConfig,
+          },
         },
       ],
       ...spriterConfig?.shape,

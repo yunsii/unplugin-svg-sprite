@@ -89,7 +89,6 @@
     "prettier": "prettier --check --write --no-plugin-search \"**/*.(js|jsx|tsx|ts|css|less|scss|sass|md|yaml|vue)\""
   },
   "dependencies": {
-    "@types/svgo": "^3.0.0",
     "chokidar": "^3.5.3",
     "consola": "^3.2.3",
     "dedent": "^1.2.0",
