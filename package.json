@@ -18,7 +18,11 @@
     "vite",
     "webpack",
     "rollup",
-    "transform"
+    "esbuild",
+    "svg-sprite",
+    "sprite",
+    "svgo",
+    "svg"
   ],
   "exports": {
     ".": {
