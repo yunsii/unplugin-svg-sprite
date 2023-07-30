@@ -10,6 +10,7 @@ import { minimatch } from 'minimatch'
 import { logger } from './log'
 import { IS_DEV, OUTPUT_DIR, SpriteMode } from './constants'
 
+import type { Config as SvgoConfig } from 'svgo'
 import type { BufferFile } from 'vinyl'
 import type { Options } from '../types'
 
@@ -44,6 +45,33 @@ export function createContext(options: Options) {
   if (debug) {
     logger.level = 4
   }
+
+  const mergedSpriterConfig = {
+    ...spriterConfig,
+    shape: {
+      transform: [
+        {
+          svgo: {
+            plugins: [
+              'preset-default',
+              { name: 'cleanupIDs', active: false },
+              { name: 'removeDimensions', active: true },
+              { name: 'removeViewBox', active: false },
+            ],
+          } as SvgoConfig,
+        },
+      ],
+      ...spriterConfig?.shape,
+    },
+    svg: {
+      xmlDeclaration: false,
+      doctypeDeclaration: false,
+      namespaceIDs: false,
+      dimensionAttributes: false,
+      ...spriterConfig?.svg,
+    },
+    log: debug ? 'debug' : undefined,
+  } as any as SVGSpriter.Config
 
   if (!Object.keys(sprites).length) {
     throw new Error(
@@ -107,13 +135,13 @@ export function createContext(options: Options) {
     logger.debug('Spriter compile start...')
 
     const staticSpriter = new SVGSpriter({
-      ...spriterConfig,
+      ...mergedSpriterConfig,
       dest: absoluteOutputStaticPath,
       mode: spriterMode,
     })
 
     const dynamicSpriter = new SVGSpriter({
-      ...spriterConfig,
+      ...mergedSpriterConfig,
       dest: absoluteOutputDynamicPath,
       mode: spriterMode,
     })
@@ -201,7 +229,9 @@ export function createContext(options: Options) {
     function printStat() {
       const result = omitBy(stat(), (value) => value.length <= 1)
       if (Object.keys(result).length) {
-        logger.log('There are same files have same file hash:')
+        logger.log(
+          'There are some SVGs have same file hash (after [ \\n\\t] removed):',
+        )
         const format = Object.keys(result).reduce((prev, current) => {
           prev += `🤖 ${current}\n`
           prev += `  - ${result[current].join('\n  - ')}\n`

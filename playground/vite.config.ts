@@ -15,7 +15,7 @@ export default defineConfig({
     tsconfigPaths(),
     react(),
     svgSprite({
-      debug: true,
+      // debug: true,
       content: ['src/assets/**/*.svg'],
       sprites: {
         symbol: {

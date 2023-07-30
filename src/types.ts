@@ -47,7 +47,7 @@ export interface Options {
    *
    * 可自定义 shape.transform: https://github.com/svg-sprite/svg-sprite/blob/main/docs/configuration.md#shape-transformations
    */
-  spriterConfig?: Omit<SVGSpriter.Config, 'dest' | 'mode'>
+  spriterConfig?: Omit<SVGSpriter.Config, 'dest' | 'mode' | 'log'>
   /** 当前支持的雪碧图配置 */
   sprites: {
     symbol?: SymbolSpriteOptions

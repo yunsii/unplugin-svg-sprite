@@ -145,6 +145,8 @@ build({
 
 - [svg-sprite](https://github.com/svg-sprite/svg-sprite)
 - [How SVG Fragment Identifiers Work](https://css-tricks.com/svg-fragment-identifiers-work/)
+- [SVG Stacks](https://simurai.com/blog/2012/04/02/svg-stacks)
+- [SVGO](https://github.com/svg/svgo)
 
 ## License
 
