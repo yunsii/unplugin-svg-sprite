@@ -33,11 +33,13 @@ export async function transformSymbolSprite(
     </svg>
   `.replace(/\n/g, '')
 
-  const spriteProps = userOptions.runtime.transformSpriteData
-    ? userOptions.runtime.transformSpriteData(pathname, defaultDomStr, data)
-    : {
-        pathname,
-      }
+  const spriteProps = data.shapes.length
+    ? userOptions.runtime.transformSpriteData
+      ? userOptions.runtime.transformSpriteData(pathname, defaultDomStr, data)
+      : {
+          pathname,
+        }
+    : {}
 
   const cwd = pathe.normalize(process.cwd())
 
