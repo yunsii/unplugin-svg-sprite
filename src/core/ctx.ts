@@ -66,7 +66,6 @@ export function createContext(options: Options) {
     svg: {
       xmlDeclaration: false,
       doctypeDeclaration: false,
-      namespaceIDs: false,
       dimensionAttributes: false,
       ...spriterConfig?.svg,
     },
