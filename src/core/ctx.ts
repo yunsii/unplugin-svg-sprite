@@ -4,7 +4,6 @@ import { get, isPlainObject, omitBy } from 'lodash'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
-import { consola } from 'consola'
 import { minimatch } from 'minimatch'
 
 import { logger } from './log'
@@ -39,10 +38,14 @@ export function createContext(options: Options) {
     spriterConfig,
     sprites = {},
     debug = false,
+    silent = false,
   } = options || {}
 
   if (debug) {
     logger.level = 4
+  }
+  if (silent) {
+    logger.level = 0
   }
 
   const mergedSpriterConfig = {
@@ -184,24 +187,18 @@ export function createContext(options: Options) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
           await fse.writeFile(resource.path, resource.contents)
+          logger.log(`Output static svg sprite: ${resource.path}`)
         }
       }
     }
     async function writeDynamicFiles() {
-      for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
-        store.svgSpriteCompiledResult!.static.result,
-      )) {
-        for (const resource of Object.values(modeResult)) {
-          await fse.ensureDir(pathe.dirname(resource.path))
-          await fse.writeFile(resource.path, resource.contents)
-        }
-      }
       for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
         store.svgSpriteCompiledResult!.dynamic.result,
       )) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
           await fse.writeFile(resource.path, resource.contents)
+          logger.log(`Output dynamic svg sprite: ${resource.path}`)
         }
       }
     }
@@ -235,10 +232,10 @@ export function createContext(options: Options) {
           prev += `🤖 ${current}\n`
           prev += `  - ${result[current].join('\n  - ')}\n`
           return prev
-        }, '\n')
-        consola.log(format)
+        }, '\n\n')
+        logger.log(format)
       } else {
-        logger.log('No duplicate svg files')
+        logger.debug('No duplicate svg files')
       }
     }
 

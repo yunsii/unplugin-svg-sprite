@@ -57,9 +57,13 @@ export interface Options {
     stack?: boolean | ModeConfig
   }
   /**
-   * Debug mode
+   * Debug mode, default `false`
    */
   debug?: boolean
+  /**
+   * Silent mode, no log or debug message will to print, default: `false`
+   */
+  silent?: boolean
 }
 
 export interface SvgSpritePosition {
