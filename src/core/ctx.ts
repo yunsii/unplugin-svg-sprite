@@ -187,7 +187,9 @@ export function createContext(options: Options) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
           await fse.writeFile(resource.path, resource.contents)
-          logger.log(`Output static svg sprite: ${resource.path}`)
+          if (resource.path.endsWith('.svg')) {
+            logger.log(`Output static svg sprite: ${resource.path}`)
+          }
         }
       }
     }
@@ -198,7 +200,9 @@ export function createContext(options: Options) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
           await fse.writeFile(resource.path, resource.contents)
-          logger.log(`Output dynamic svg sprite: ${resource.path}`)
+          if (resource.path.endsWith('.svg')) {
+            logger.log(`Output dynamic svg sprite: ${resource.path}`)
+          }
         }
       }
     }
