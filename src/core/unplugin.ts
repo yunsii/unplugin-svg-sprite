@@ -68,20 +68,28 @@ export default createUnplugin<Options>((options) => {
     async transform(_, id) {
       const normalizeId = pathe.normalize(id)
       logger.debug('Got transform id', normalizeId)
-      const realId = ctx.useSymbolResourceQuery
+      const parsedId = ctx.useSymbolResourceQuery
         ? pathe.normalize(id.replace('.svg?symbol', '.svg'))
         : normalizeId
       await ctx.api.waitSpriteCompiled()
-      const target = ctx.store.transformMap.get(realId)
+      const target = ctx.store.transformMap.get(parsedId)
 
       if (!target) {
-        throw new Error(`svg sprite [${realId}] not found`)
+        throw new Error(`svg sprite [${parsedId}] not found`)
       }
 
-      ctx.store.transformMap.set(realId, {
+      ctx.store.transformMap.set(parsedId, {
         ...target,
         used: true,
       })
+
+      const originUniqId = ctx.store.duplicatedHashes[target.hash]
+
+      if (originUniqId) {
+        logger.debug(`Duplicated id, corresponding uniq id: ${originUniqId}`)
+      }
+
+      const readId = originUniqId || parsedId
 
       const compiledResult = ctx.store.svgSpriteCompiledResult!
       const staticPathname = pathe.join(
@@ -91,7 +99,7 @@ export default createUnplugin<Options>((options) => {
         (compiledResult.static.data.symbol as SvgSpriteSymbolData).sprite,
       )
 
-      return transformSymbolItem(realId, {
+      return transformSymbolItem(readId, {
         compiledResult,
         userOptions: ctx.sprites.symbol!,
         transformData: target,

@@ -5,6 +5,7 @@ import ViteSvg from '@/assets/raw/vite.svg'
 import ReactSvg from '@/assets/raw/react.svg'
 import VercelSvg from '@/assets/raw/vercel.svg'
 import VercelCopySvg from '@/assets/vercel.svg'
+import ReactCopy2Svg from '@/assets/react-copy-2.svg'
 
 export default function Home() {
   const [count, setCount] = useState(0)
@@ -18,6 +19,7 @@ export default function Home() {
       <ReactSvg />
       <VercelSvg />
       <VercelCopySvg />
+      <ReactCopy2Svg />
     </main>
   )
 }

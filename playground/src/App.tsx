@@ -5,6 +5,7 @@ import ViteSvg from '@/assets/raw/vite.svg'
 import ReactSvg from '@/assets/raw/react.svg'
 import VercelSvg from '@/assets/raw/vercel.svg'
 import VercelCopySvg from '@/assets/vercel.svg'
+import ReactCopy2Svg from '@/assets/react-copy-2.svg'
 
 import './App.less'
 
@@ -19,6 +20,7 @@ function App() {
         <VercelSvg />
         <ViteSvg />
         <VercelCopySvg />
+        <ReactCopy2Svg />
       </div>
     </div>
   )

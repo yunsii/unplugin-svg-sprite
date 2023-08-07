@@ -23,8 +23,6 @@ export interface TransformData {
   runtimeId: string
   /** Flag indicate whether the svg has been used */
   used: boolean
-  /** Whether a duplicated svg */
-  duplicated: boolean
 }
 
 /** SVG full path and its detail data */
@@ -120,6 +118,8 @@ export function createContext(options: Options) {
   const store = {
     /** All SVG cache map */
     transformMap: new Map() as TransformMap,
+    /** hash, uniq path */
+    duplicatedHashes: {} as Record<string, string>,
     svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
   }
   const compile = async (
@@ -165,18 +165,28 @@ export function createContext(options: Options) {
     let staticCount = 0
     let dynamicCount = 0
 
-    store.transformMap.forEach((value, key) => {
-      if (optimization && !value.used) {
+    const addedDuplicatedHashes: string[] = []
+
+    store.transformMap.forEach((item, key) => {
+      if (optimization && !item.used) {
         logger.debug(`Never been used svg: ${key}`)
         return
       }
+      if (optimization && store.duplicatedHashes[item.hash]) {
+        if (addedDuplicatedHashes.includes(item.hash)) {
+          logger.debug(`Duplicated svg [${item.hash}]: ${key}`)
+          return
+        } else {
+          addedDuplicatedHashes.push(item.hash)
+        }
+      }
 
-      if (value.type === 'static') {
+      if (item.type === 'static') {
         staticCount += 1
-        staticSpriter.add(value.svgHashPath, null, value.svgStr)
+        staticSpriter.add(item.svgHashPath, null, item.svgStr)
       } else {
         dynamicCount += 1
-        dynamicSpriter.add(value.svgHashPath, null, value.svgStr)
+        dynamicSpriter.add(item.svgHashPath, null, item.svgStr)
       }
     })
 
@@ -404,7 +414,6 @@ export function createContext(options: Options) {
       svgHashPath,
       runtimeId: svgId,
       used: false,
-      duplicated: false,
     })
   }
 
@@ -424,6 +433,19 @@ export function createContext(options: Options) {
       .forEach((item) => {
         upsertSvg(item, _transformMap)
       })
+
+    const hashed: Record<string, string> = {}
+    _transformMap.forEach((item, key) => {
+      if (hashed[item.hash]) {
+        if (!store.duplicatedHashes[item.hash]) {
+          store.duplicatedHashes[item.hash] = hashed[item.hash]
+        }
+        const originData = _transformMap.get(hashed[item.hash])!
+        _transformMap.set(key, originData)
+      } else {
+        hashed[item.hash] = key
+      }
+    })
 
     store.transformMap = _transformMap
 
