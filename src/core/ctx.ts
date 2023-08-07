@@ -42,10 +42,11 @@ export function createContext(options: Options) {
   } = options || {}
 
   if (debug) {
+    // ref: https://github.com/unjs/consola#log-level
     logger.level = 4
   }
   if (silent) {
-    logger.level = 0
+    logger.level = 1
   }
 
   const mergedSpriterConfig = {
