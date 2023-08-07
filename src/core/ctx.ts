@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 
-import { get, isPlainObject, omitBy } from 'lodash'
+import { get, isPlainObject, omitBy, padStart } from 'lodash'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
@@ -225,15 +225,21 @@ export function createContext(options: Options) {
     function printStat() {
       const result = omitBy(stat(), (value) => value.length <= 1)
       if (Object.keys(result).length) {
-        logger.log(
-          'There are some SVGs have same file hash (after [ \\n\\t] removed):',
+        const format = Object.keys(result).reduce(
+          (prev, current, index, array) => {
+            prev += `🤖 ${padStart(
+              `${index + 1}`,
+              String(array.length).length,
+              '0',
+            )}.${current}\n`
+            prev += `  - ${result[current].join('\n  - ')}\n`
+            return prev
+          },
+          '\n\n',
         )
-        const format = Object.keys(result).reduce((prev, current) => {
-          prev += `🤖 ${current}\n`
-          prev += `  - ${result[current].join('\n  - ')}\n`
-          return prev
-        }, '\n\n')
-        logger.log(format)
+        logger.log(
+          `There are some SVGs have same file hash (after [ \\n\\t] removed):${format}`,
+        )
       } else {
         logger.debug('No duplicate svg files')
       }
