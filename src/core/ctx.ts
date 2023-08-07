@@ -282,7 +282,7 @@ export function createContext(options: Options) {
 
           await fse.writeFile(resource.path, resource.contents)
           if (resource.path.endsWith('.svg')) {
-            logger.log(`Output static svg sprite: ${resource.path}`)
+            logger.debug(`Output static svg sprite: ${resource.path}`)
           }
         }
       }
@@ -320,7 +320,7 @@ export function createContext(options: Options) {
 
           await fse.writeFile(resource.path, resource.contents)
           if (resource.path.endsWith('.svg')) {
-            logger.log(`Output dynamic svg sprite: ${resource.path}`)
+            logger.debug(`Output dynamic svg sprite: ${resource.path}`)
           }
         }
       }
@@ -398,10 +398,10 @@ export function createContext(options: Options) {
     const svgHashPath = pathe.join(pathe.dirname(path), `${svgId}.svg`)
 
     if (_map.get(path)) {
-      logger.log(`Update ${type} svg`, path)
+      logger.debug(`Update ${type} svg`, path)
     } else {
       if (watch) {
-        logger.log(`Add ${type} svg`, path)
+        logger.debug(`Add ${type} svg`, path)
       } else {
         logger.debug(`Add ${type} svg`, path)
       }
@@ -508,7 +508,7 @@ export function createContext(options: Options) {
       type
     ) {
       store.transformMap.delete(path)
-      logger.log(`Delete ${type} svg`, path)
+      logger.debug(`Delete ${type} svg`, path)
       compile()
     }
   }
