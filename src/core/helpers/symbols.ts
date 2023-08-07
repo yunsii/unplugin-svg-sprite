@@ -35,6 +35,8 @@ export async function transformSymbolSprite(
     throw new TypeError('Please export valid sprite generator function')
   }
 
+  // For better performance and auto optimization, use *pathname* is a best approach.
+  // Because runtime dom string includes all svg shapes, not been optimized.
   const defaultDomStr = `
     <svg width="0" height="0" style="position:absolute">
       ${data.shapes.map((item) => item.svg).join('')}

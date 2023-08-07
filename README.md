@@ -7,16 +7,16 @@
 ## 🎉 Features
 
 - 🦄 [Unified plugin](https://github.com/unjs/unplugin), support Vite/Rollup/Webpack/Nuxt/esbuild
-- 🚀 Framework-agnostic, use whatever framework you like
+- ❤️ Framework-agnostic, use whatever framework you like
 - 😎 Import SVG file directly in the source code
-- 😄 HMR supported (Vite/Webpack)
 - 🪁 \*Inject **dynamic SVG sprite** only
-- 🤖 Detect duplicated SVG files
-- 💎 SSR supported
+- 😄 HMR supported (Vite/Webpack)
+- 🤖 Detect duplicated SVG shapes
+- 🚀 Auto optimization for unused and duplicated svg shapes (After build)
 
 > There is [some SVG nodes](https://stackoverflow.com/a/74173265/8335317) will make SVG item broken, if `use` node `href` property is external link like `/svg-sprite-symbol#unplugin`. I call it `dynamic SVG`, because regular SVG can use with external **static resource** link smoothly.
 >
-> Fortunately, with the plugin, you can just use injected `href` property to resolve the situation. Only **Dynamic SVG sprite** will inject to the DOM.
+> Fortunately, with the plugin, you can just use injected `href` property to resolve the situation. Only **dynamic SVG sprite** will inject to the DOM.
 
 ## 👀 Install
 
