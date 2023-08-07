@@ -78,6 +78,11 @@ export default createUnplugin<Options>((options) => {
         throw new Error(`svg sprite [${realId}] not found`)
       }
 
+      ctx.store.transformMap.set(realId, {
+        ...target,
+        used: true,
+      })
+
       const compiledResult = ctx.store.svgSpriteCompiledResult!
       const staticPathname = pathe.join(
         ctx.path.absoluteOutputPath.replace(ctx.path.absolutePublicPath, ''),
@@ -91,6 +96,11 @@ export default createUnplugin<Options>((options) => {
         userOptions: ctx.sprites.symbol!,
         transformData: target,
         staticPathname,
+      })
+    },
+    async buildEnd() {
+      await ctx.api.compile({
+        optimization: true,
       })
     },
     vite: {

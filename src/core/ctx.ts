@@ -19,15 +19,20 @@ export interface TransformData {
   hash: string
   /** SVG full path, svg name with hash postfix */
   svgHashPath: string
+  /** [name]-[hash] */
   runtimeId: string
+  /** Flag indicate whether the svg has been used */
+  used: boolean
+  /** Whether a duplicated svg */
+  duplicated: boolean
 }
 
 /** SVG full path and its detail data */
 export type TransformMap = Map<string, TransformData>
 
 export interface SvgSpriteCompiledResult {
-  static: { result: any; data: any }
-  dynamic: { result: any; data: any }
+  static: { result: { [mode: string]: { sprite: BufferFile } }; data: any }
+  dynamic: { result: { [mode: string]: { sprite: BufferFile } }; data: any }
 }
 
 export function createContext(options: Options) {
@@ -93,23 +98,6 @@ export function createContext(options: Options) {
   const useSymbolResourceQuery =
     'symbol' in sprites && !!sprites.symbol?.runtime.resourceQuery
 
-  const spriterMode = userModes.reduce((prev, current) => {
-    const userCurrentConfig = get(sprites, [current])
-    const mergedConfig = isPlainObject(userCurrentConfig)
-      ? userCurrentConfig
-      : {}
-
-    return {
-      ...prev,
-      [current]: {
-        example: debug,
-        /** For better HMR, SVG sprite file name without hash in DEV env */
-        bust: !IS_DEV,
-        ...mergedConfig,
-      },
-    }
-  }, {} as SVGSpriter.Mode)
-
   const isDynamicSvg = (svgStr: string) => {
     // ref: https://stackoverflow.com/a/74173265/8335317
     return [
@@ -134,8 +122,33 @@ export function createContext(options: Options) {
     transformMap: new Map() as TransformMap,
     svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
   }
-  const compile = async () => {
-    logger.debug('Spriter compile start...')
+  const compile = async (
+    options: { optimization?: boolean } = { optimization: false },
+  ) => {
+    const { optimization = false } = options
+
+    if (optimization) {
+      logger.debug('Spriter compile start...')
+    } else {
+      logger.debug('Spriter compile with optimization start...')
+    }
+
+    const spriterMode = userModes.reduce((prev, current) => {
+      const userCurrentConfig = get(sprites, [current])
+      const mergedConfig = isPlainObject(userCurrentConfig)
+        ? userCurrentConfig
+        : {}
+
+      return {
+        ...prev,
+        [current]: {
+          example: !optimization && debug,
+          /** For better HMR, SVG sprite file name without hash in DEV env */
+          bust: !IS_DEV,
+          ...mergedConfig,
+        },
+      }
+    }, {} as SVGSpriter.Mode)
 
     const staticSpriter = new SVGSpriter({
       ...mergedSpriterConfig,
@@ -152,7 +165,12 @@ export function createContext(options: Options) {
     let staticCount = 0
     let dynamicCount = 0
 
-    store.transformMap.forEach((value) => {
+    store.transformMap.forEach((value, key) => {
+      if (optimization && !value.used) {
+        logger.debug(`Never been used svg: ${key}`)
+        return
+      }
+
       if (value.type === 'static') {
         staticCount += 1
         staticSpriter.add(value.svgHashPath, null, value.svgStr)
@@ -162,8 +180,31 @@ export function createContext(options: Options) {
       }
     })
 
-    logger.log(`SVG sprite static transform size: ${staticCount}`)
-    logger.log(`SVG sprite dynamic transform size: ${dynamicCount}`)
+    if (optimization) {
+      let originStaticSize = 0
+      let originDynamicSize = 0
+      store.transformMap.forEach((item) => {
+        if (item.type === 'static') {
+          originStaticSize += 1
+        } else {
+          originDynamicSize += 1
+        }
+      })
+
+      if (originStaticSize !== staticCount) {
+        logger.warn(
+          `Static svg sprite size optimized: ${originStaticSize} => ${staticCount}`,
+        )
+      }
+      if (originDynamicSize !== dynamicCount) {
+        logger.warn(
+          `Dynamic svg sprite size optimized: ${originStaticSize} => ${staticCount}`,
+        )
+      }
+    } else {
+      logger.log(`SVG sprite static transform size: ${staticCount}`)
+      logger.log(`SVG sprite dynamic transform size: ${dynamicCount}`)
+    }
 
     const [staticResult, dynamicResult] = await Promise.all([
       staticSpriter.compileAsync(),
@@ -175,18 +216,60 @@ export function createContext(options: Options) {
     }
 
     if (debug) {
-      logger.debug('Spriter compile end')
+      if (optimization) {
+        logger.debug('Spriter compile with optimization end')
+      } else {
+        logger.debug('Spriter compile end')
+      }
     }
 
-    logger.debug('Write sprite files start...')
+    if (optimization) {
+      logger.debug('Write optimized sprite files start...')
+    } else {
+      logger.debug('Write sprite files start...')
+    }
+
+    const { globbySync } = await import('globby')
+    const generatedSvgSprites = globbySync(
+      ['static/**/sprite.*-*.svg', 'dynamic/**/sprite.*-*.svg'],
+      {
+        cwd: absoluteOutputPath,
+      },
+    )
+
     fse.emptyDirSync(absoluteOutputPath)
 
     async function writeStaticFiles() {
-      for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
+      for (const [mode, modeResult] of Object.entries(
         store.svgSpriteCompiledResult!.static.result,
       )) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
+
+          // Only write svg sprite if compile with optimization
+          if (optimization) {
+            if (resource.path.endsWith('.svg')) {
+              // Find generated svg sprite path in build start stage
+              const targetGeneratedPath = generatedSvgSprites.find((item) => {
+                return pathe
+                  .normalize(item)
+                  .startsWith(pathe.join('static', mode))
+              })
+              if (!targetGeneratedPath) {
+                throw new Error('targetGeneratedPath not found')
+              }
+              const optimizedFilePath = pathe.join(
+                absoluteOutputPath,
+                targetGeneratedPath,
+              )
+              await fse.writeFile(optimizedFilePath, resource.contents)
+              logger.log(
+                `Output optimized static svg sprite: ${optimizedFilePath}`,
+              )
+            }
+            return
+          }
+
           await fse.writeFile(resource.path, resource.contents)
           if (resource.path.endsWith('.svg')) {
             logger.log(`Output static svg sprite: ${resource.path}`)
@@ -195,11 +278,36 @@ export function createContext(options: Options) {
       }
     }
     async function writeDynamicFiles() {
-      for (const [_, modeResult] of Object.entries<{ string: BufferFile }>(
+      for (const [mode, modeResult] of Object.entries(
         store.svgSpriteCompiledResult!.dynamic.result,
       )) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
+
+          // Only write svg sprite if compile with optimization
+          if (optimization) {
+            if (resource.path.endsWith('.svg')) {
+              // Find generated svg sprite path in build start stage
+              const targetGeneratedPath = generatedSvgSprites.find((item) => {
+                return pathe
+                  .normalize(item)
+                  .startsWith(pathe.join('dynamic', mode))
+              })
+              if (!targetGeneratedPath) {
+                throw new Error('targetGeneratedPath not found')
+              }
+              const optimizedFilePath = pathe.join(
+                absoluteOutputPath,
+                targetGeneratedPath,
+              )
+              await fse.writeFile(optimizedFilePath, resource.contents)
+              logger.log(
+                `Output optimized dynamic svg sprite: ${optimizedFilePath}`,
+              )
+            }
+            return
+          }
+
           await fse.writeFile(resource.path, resource.contents)
           if (resource.path.endsWith('.svg')) {
             logger.log(`Output dynamic svg sprite: ${resource.path}`)
@@ -251,7 +359,14 @@ export function createContext(options: Options) {
     }
 
     await Promise.all([writeStaticFiles(), writeDynamicFiles()])
-    logger.debug('Write sprite files end')
+
+    if (optimization) {
+      logger.debug('Write optimized sprite files end')
+      return
+    } else {
+      logger.debug('Write sprite files end')
+    }
+
     logger.debug('Svg stat start')
     printStat()
     logger.debug('Svg stat end')
@@ -288,6 +403,8 @@ export function createContext(options: Options) {
       hash,
       svgHashPath,
       runtimeId: svgId,
+      used: false,
+      duplicated: false,
     })
   }
 
