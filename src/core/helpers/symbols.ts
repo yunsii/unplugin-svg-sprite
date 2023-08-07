@@ -1,5 +1,8 @@
 import pathe from 'pathe'
 
+import { logger } from '../log'
+import { SVG_SPRITE_SYMBOL } from '../constants'
+
 import type { SvgSpriteCompiledResult, TransformData } from '../ctx'
 import type { SvgSpriteSymbolData, SymbolSpriteOptions } from '../../types'
 
@@ -12,6 +15,11 @@ export async function transformSymbolSprite(
   },
 ) {
   const { userOptions, pathname } = context
+
+  if (!data.shapes.length) {
+    logger.warn(`There is no dynamic SVG shapes,`)
+    logger.warn(`You do not have to use ${SVG_SPRITE_SYMBOL} component.`)
+  }
 
   const spriteGeneratorPath = `file:///${pathe.normalize(
     userOptions.runtime.spriteGenerator,
