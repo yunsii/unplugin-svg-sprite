@@ -107,9 +107,11 @@ export default createUnplugin<Options>((options) => {
       })
     },
     async buildEnd() {
-      await ctx.api.compile({
-        optimization: true,
-      })
+      if (process.env.NODE_ENV !== 'development') {
+        await ctx.api.compile({
+          optimization: true,
+        })
+      }
     },
     vite: {
       configureServer(server) {

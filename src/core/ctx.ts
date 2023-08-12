@@ -128,9 +128,9 @@ export function createContext(options: Options) {
     const { optimization = false } = options
 
     if (optimization) {
-      logger.debug('Spriter compile start...')
-    } else {
       logger.debug('Spriter compile with optimization start...')
+    } else {
+      logger.debug('Spriter compile start...')
     }
 
     const spriterMode = userModes.reduce((prev, current) => {
@@ -241,7 +241,7 @@ export function createContext(options: Options) {
 
     const { globbySync } = await import('globby')
     const generatedSvgSprites = globbySync(
-      ['static/**/sprite.*-*.svg', 'dynamic/**/sprite.*-*.svg'],
+      ['static/**/sprite.*.svg', 'dynamic/**/sprite.*.svg'],
       {
         cwd: absoluteOutputPath,
       },
