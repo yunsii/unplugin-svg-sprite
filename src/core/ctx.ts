@@ -127,6 +127,15 @@ export function createContext(options: Options) {
   ) => {
     const { optimization = false } = options
 
+    // If not optimized and has compiled result,
+    // no need to re-compile
+    if (store.svgSpriteCompiledResult && !optimization) {
+      logger.debug(
+        'Has compiled result, no need to re-compile with un-optimization',
+      )
+      return
+    }
+
     if (optimization) {
       logger.debug('Spriter compile with optimization start...')
     } else {
