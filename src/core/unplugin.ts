@@ -107,7 +107,7 @@ export default createUnplugin<Options>((options) => {
       })
     },
     async buildEnd() {
-      if (process.env.NODE_ENV !== 'development') {
+      if (process.env.NODE_ENV !== 'development' && !ctx.store.optimized) {
         await ctx.api.compile({
           optimization: true,
         })

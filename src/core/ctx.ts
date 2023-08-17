@@ -120,6 +120,7 @@ export function createContext(options: Options) {
     /** hash, uniq path */
     duplicatedHashes: {} as Record<string, string>,
     svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
+    optimized: false,
   }
   const compile = async (
     options: { optimization?: boolean } = { optimization: false },
@@ -371,6 +372,7 @@ export function createContext(options: Options) {
 
     if (optimization) {
       logger.debug('Write optimized sprite files end')
+      store.optimized = true
       return
     } else {
       logger.debug('Write sprite files end')
