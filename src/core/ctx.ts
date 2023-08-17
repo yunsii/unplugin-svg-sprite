@@ -207,7 +207,7 @@ export function createContext(options: Options) {
       }
       if (originDynamicSize !== dynamicCount) {
         logger.warn(
-          `Dynamic svg sprite size optimized: ${originStaticSize} => ${staticCount}`,
+          `Dynamic svg sprite size optimized: ${originDynamicSize} => ${dynamicCount}`,
         )
       }
     } else {
