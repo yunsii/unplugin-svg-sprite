@@ -62,7 +62,6 @@ export function createContext(options: Options) {
           svgo: {
             plugins: [
               'preset-default',
-              { name: 'removeDimensions', active: true },
               { name: 'removeViewBox', active: false },
             ],
           },
