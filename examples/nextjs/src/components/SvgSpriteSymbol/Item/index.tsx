@@ -9,7 +9,12 @@ const SvgSpriteItem = (
   const { item, ...rest } = props
 
   return (
-    <svg ref={ref} {...rest}>
+    <svg
+      ref={ref}
+      width={item.width.outer}
+      height={item.height.outer}
+      {...rest}
+    >
       <use href={item.href} xlinkHref={item.href} />
     </svg>
   )
