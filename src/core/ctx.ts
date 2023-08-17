@@ -120,6 +120,11 @@ export function createContext(options: Options) {
     /** hash, uniq path */
     duplicatedHashes: {} as Record<string, string>,
     svgSpriteCompiledResult: null as SvgSpriteCompiledResult | null,
+    /**
+     * In Next.js env, after optimized result, still call `transform` hook,
+     * So use extra memo to store optimized result to keep svg static path immutable.
+     */
+    svgSpriteOptimizedCompiledResult: null as SvgSpriteCompiledResult | null,
     optimized: false,
   }
   const compile = async (
@@ -229,9 +234,17 @@ export function createContext(options: Options) {
       staticSpriter.compileAsync(),
       dynamicSpriter.compileAsync(),
     ])
-    store.svgSpriteCompiledResult = {
-      static: staticResult,
-      dynamic: dynamicResult,
+
+    if (optimization) {
+      store.svgSpriteOptimizedCompiledResult = {
+        static: staticResult,
+        dynamic: dynamicResult,
+      }
+    } else {
+      store.svgSpriteCompiledResult = {
+        static: staticResult,
+        dynamic: dynamicResult,
+      }
     }
 
     if (debug) {
@@ -259,8 +272,11 @@ export function createContext(options: Options) {
     fse.emptyDirSync(absoluteOutputPath)
 
     async function writeStaticFiles() {
+      const compileResult = optimization
+        ? store.svgSpriteOptimizedCompiledResult
+        : store.svgSpriteCompiledResult
       for (const [mode, modeResult] of Object.entries(
-        store.svgSpriteCompiledResult!.static.result,
+        compileResult!.static.result,
       )) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))
@@ -297,8 +313,11 @@ export function createContext(options: Options) {
       }
     }
     async function writeDynamicFiles() {
+      const compileResult = optimization
+        ? store.svgSpriteOptimizedCompiledResult
+        : store.svgSpriteCompiledResult
       for (const [mode, modeResult] of Object.entries(
-        store.svgSpriteCompiledResult!.dynamic.result,
+        compileResult!.dynamic.result,
       )) {
         for (const resource of Object.values(modeResult)) {
           await fse.ensureDir(pathe.dirname(resource.path))

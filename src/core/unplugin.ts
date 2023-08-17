@@ -106,7 +106,7 @@ export default createUnplugin<Options>((options) => {
         staticPathname,
       })
     },
-    async buildEnd() {
+    async writeBundle() {
       if (process.env.NODE_ENV !== 'development' && !ctx.store.optimized) {
         await ctx.api.compile({
           optimization: true,
