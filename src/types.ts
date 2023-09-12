@@ -3,6 +3,15 @@ import type SVGSpriter from 'svg-sprite'
 import type { ModeConfig } from 'svg-sprite'
 
 export interface SymbolSpriteOptions extends ModeConfig {
+  /**
+   * Simplest optimization algorithm, If not been **transform**ed svg will be ignored to generate svg sprite.
+   *
+   * [WARNING] If svg used in dynamic components, or pure CSR application,
+   * the svg will be lost.
+   *
+   * default: false
+   */
+  compileOptimization?: boolean
   runtime: {
     /** Whether use resourceQuery: ?symbol, default: false */
     resourceQuery?: boolean

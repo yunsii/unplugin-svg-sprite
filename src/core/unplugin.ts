@@ -107,7 +107,11 @@ export default createUnplugin<Options>((options) => {
       })
     },
     async writeBundle() {
-      if (process.env.NODE_ENV !== 'development' && !ctx.store.optimized) {
+      if (
+        ctx.sprites.symbol?.compileOptimization &&
+        process.env.NODE_ENV !== 'development' &&
+        !ctx.store.optimized
+      ) {
         await ctx.api.compile({
           optimization: true,
         })
