@@ -1,3 +1,7 @@
+> If you are using Tailwind CSS, I recommend you can try to use svg icons by tailwind plugin by [iconify.design](https://iconify.design/docs/usage/css/tailwind/#options), where icons are used as background or mask image.
+>
+> Also I create a tailwind plugin [tailwindcss-plugin-iconify](https://github.com/yunsii/tailwindcss-plugin-iconify) for more easy to use, especially for import local svg icons or import icons from figma.
+
 # unplugin-svg-sprite
 
 [![npm version][npm-version-src]][npm-version-href] [![npm downloads][npm-downloads-src]][npm-downloads-href] [![License][license-src]][license-href]
