@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 
-import { get, isPlainObject, omitBy, padStart } from 'lodash'
+import pkg from 'lodash';
+const { get, isPlainObject, omitBy, padStart } = pkg;
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
