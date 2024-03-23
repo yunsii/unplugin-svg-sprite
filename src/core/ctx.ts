@@ -1,7 +1,6 @@
 import crypto from 'node:crypto'
 
-import pkg from 'lodash';
-const { get, isPlainObject, omitBy, padStart } = pkg;
+import _ from 'lodash'
 import pathe from 'pathe'
 import SVGSpriter from 'svg-sprite'
 import fse from 'fs-extra'
@@ -149,8 +148,8 @@ export function createContext(options: Options) {
     }
 
     const spriterMode = userModes.reduce((prev, current) => {
-      const userCurrentConfig = get(sprites, [current])
-      const mergedConfig = isPlainObject(userCurrentConfig)
+      const userCurrentConfig = _.get(sprites, [current])
+      const mergedConfig = _.isPlainObject(userCurrentConfig)
         ? userCurrentConfig
         : {}
 
@@ -375,11 +374,11 @@ export function createContext(options: Options) {
     }
 
     function printStat() {
-      const result = omitBy(stat(), (value) => value.length <= 1)
+      const result = _.omitBy(stat(), (value) => value.length <= 1)
       if (Object.keys(result).length) {
         const format = Object.keys(result).reduce(
           (prev, current, index, array) => {
-            prev += `🤖 ${padStart(
+            prev += `🤖 ${_.padStart(
               `${index + 1}`,
               String(array.length).length,
               '0',
