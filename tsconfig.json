@@ -12,5 +12,6 @@
     "paths": {
       "unplugin-svg-sprite": ["./src"]
     }
-  }
+  },
+  "exclude": ["examples", "playground", "dist"]
 }
